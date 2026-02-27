@@ -2,6 +2,6 @@ Flask==3.0.0
 requests==2.31.0
 waitress==3.0.2
 bcrypt==4.3.0
-qrcode[pil]==7.4.2 # Added qrcode with PIL support
+qrcode[pil]==8.2 # Added qrcode with PIL support
 pyotp==2.9.0       # Added pyotp
 pywin32==306; sys_platform == 'win32' # For Windows service support
