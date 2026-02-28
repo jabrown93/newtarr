@@ -1,5 +1,5 @@
-APP=media-artwork-uploader
-REGISTRY=jabrown
+APP=newtarr
+REGISTRY=ghcr.io/jabrown93
 TAG?=$(shell git describe --tags --always --dirty)
 PLATFORMS=linux/amd64,linux/arm64
 

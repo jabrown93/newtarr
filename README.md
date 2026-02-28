@@ -1,14 +1,34 @@
 # NewtArr
 
-A neutered fork of [Huntarr](https://github.com/plexguide/Huntarr.io) v6.6.3, from simpler times, maintained by [ElfHosted](https://store.elfhosted.com).
+## Warning
+
+AI agents have been used in this code base, and while efforts have been made to ensure code quality and security, there
+may be issues. A comprehensive security audit has been performed on the inherited v6.6.3 codebase, but users should
+review the findings in [SECURITY-AUDIT.md](SECURITY-AUDIT.md) and apply recommended mitigations, especially if running
+standalone without an SSO proxy.
+
+AI generated changes made in this fork will be reviewed by a professional software engineer, but users should still
+exercise caution and follow best practices when deploying. This fork is intended for my own usage and support is a best
+effort basis. I will do my best to address any issues that arise, but there are no guarantees.
+
+**DO NOT EXPOSE TO PUBLIC INTERNET**
+
+# Original README from ElfHosted fork follow below
+
+A neutered fork of [Huntarr](https://github.com/plexguide/Huntarr.io) v6.6.3, from simpler times, maintained
+by [ElfHosted](https://store.elfhosted.com).
 
 ## Why this fork?
 
-The original Huntarr project was abandoned under controversial circumstances. The developer introduced telemetry, obfuscated code, and potential security concerns that led to significant community backlash. For context, see [this Reddit thread](https://www.reddit.com/r/selfhosted/comments/1rckopd/huntarr_your_passwords_and_your_entire_arr_stacks/?share_id=uq4GWZe3e0FNKUIXWHiq8).
+The original Huntarr project was abandoned under controversial circumstances. The developer introduced telemetry,
+obfuscated code, and potential security concerns that led to significant community backlash. For context,
+see [this Reddit thread](https://www.reddit.com/r/selfhosted/comments/1rckopd/huntarr_your_passwords_and_your_entire_arr_stacks/?share_id=uq4GWZe3e0FNKUIXWHiq8).
 
-NewtArr is based on v6.6.3, the last clean release before the controversial changes. It has been customized for use within [ElfHosted](https://store.elfhosted.com), but can be used standalone.
+NewtArr is based on v6.6.3, the last clean release before the controversial changes. It has been customized for use
+within [ElfHosted](https://store.elfhosted.com), but can be used standalone.
 
-Read the full announcement: [Huntarr Ends Its Hunt, NewtArr Takes It Up](https://store.elfhosted.com/blog/2026/02/24/huntarr-ends-its-hunt-newtarr-takes-it-up/)
+Read the full
+announcement: [Huntarr Ends Its Hunt, NewtArr Takes It Up](https://store.elfhosted.com/blog/2026/02/24/huntarr-ends-its-hunt-newtarr-takes-it-up/)
 
 ## Huntarr Feature Timeline
 
@@ -31,7 +51,8 @@ Understanding why we forked at v6.6.3:
 
 ### v7.x — Scope Explosion (529 commits!)
 
-- Requestarr system introduced — full TMDB discovery, request/approve workflow, multi-user with roles (Owner/Moderator/User)
+- Requestarr system introduced — full TMDB discovery, request/approve workflow, multi-user with roles (
+  Owner/Moderator/User)
 - Prowlarr integration — indexer management (~26K lines in routes alone)
 - Plex OAuth authentication
 - Database layer ballooned (348 lines to 108KB)
@@ -57,7 +78,8 @@ If you want just the "hunt missing episodes/movies" functionality, the sweet spo
 - **v6.0.x** if you want the absolute minimum (Sonarr/Radarr/Lidarr/Readarr only, no multi-instance)
 - **v6.6.3** *(this fork)* if you want multi-instance support + Swaparr but before the Requestarr/Prowlarr bloat
 
-Avoid 7.x+ — that's where the request system, Plex auth, Prowlarr, and the massive DB layer arrived. And 9.x is a completely different application with built-in download clients.
+Avoid 7.x+ — that's where the request system, Plex auth, Prowlarr, and the massive DB layer arrived. And 9.x is a
+completely different application with built-in download clients.
 
 ## Changes from upstream Huntarr v6.6.3
 
@@ -72,15 +94,17 @@ Avoid 7.x+ — that's where the request system, Plex auth, Prowlarr, and the mas
 
 ## What it does
 
-NewtArr continuously searches your *arr media libraries (Sonarr, Radarr, Lidarr, Readarr, Whisparr) for missing content and items that need quality upgrades. It automatically triggers searches while being gentle on your indexers, helping you gradually complete your media collection.
+NewtArr continuously searches your *arr media libraries (Sonarr, Radarr, Lidarr, Readarr, Whisparr) for missing content
+and items that need quality upgrades. It automatically triggers searches while being gentle on your indexers, helping
+you gradually complete your media collection.
 
-| Application | Status |
-| :---------- | :------------ |
-| Sonarr | Supported |
-| Radarr | Supported |
-| Lidarr | Supported |
-| Readarr | Supported |
-| Whisparr v2 | Supported |
+| Application        | Status    |
+|:-------------------|:----------|
+| Sonarr             | Supported |
+| Radarr             | Supported |
+| Lidarr             | Supported |
+| Readarr            | Supported |
+| Whisparr v2        | Supported |
 | Whisparr v3 (Eros) | Supported |
 
 ## Running with Docker
@@ -111,11 +135,16 @@ All configuration is done via the web UI. Settings are stored in `/config/`.
 
 ## Security
 
-A comprehensive security audit of the inherited v6.6.3 codebase has been performed. See [SECURITY-AUDIT.md](SECURITY-AUDIT.md) for the full report.
+A comprehensive security audit of the inherited v6.6.3 codebase has been performed.
+See [SECURITY-AUDIT.md](SECURITY-AUDIT.md) for the full report.
 
-**Key findings:** The original codebase contains several security issues (hardcoded secret key, weak password hashing, XSS via innerHTML, no CSRF protection). Most authentication-related issues are mitigated when running behind an SSO proxy (the intended ElfHosted deployment model). Standalone users should review the audit and apply the recommended mitigations.
+**Key findings:** The original codebase contains several security issues (hardcoded secret key, weak password hashing,
+XSS via innerHTML, no CSRF protection). Most authentication-related issues are mitigated when running behind an SSO
+proxy (the intended ElfHosted deployment model). Standalone users should review the audit and apply the recommended
+mitigations.
 
-**Positive:** No telemetry, phone-home code, obfuscated code, or data exfiltration mechanisms were found in the v6.6.3 codebase.
+**Positive:** No telemetry, phone-home code, obfuscated code, or data exfiltration mechanisms were found in the v6.6.3
+codebase.
 
 ## License
 
