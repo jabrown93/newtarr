@@ -72,15 +72,15 @@ jobs:
         id: build
         continue-on-error: true
         run: |
-          if [ -f "artwork_uploader.spec" ]; then
+          if [ -f "newtarr.spec" ]; then
             pip install pyinstaller
-            pyinstaller artwork_uploader.spec
+            pyinstaller newtarr.spec
 
             # Create archives of the built executables
-            if [ -d "dist/artwork_uploader" ]; then
+            if [ -d "dist/newtarr" ]; then
               cd dist
-              zip -r newtarr-${{ steps.get_version.outputs.VERSION }}-linux.zip artwork_uploader/
-              tar czf newtarr-${{ steps.get_version.outputs.VERSION }}-linux.tar.gz artwork_uploader/
+              zip -r newtarr-${{ steps.get_version.outputs.VERSION }}-linux.zip newtarr/
+              tar czf newtarr-${{ steps.get_version.outputs.VERSION }}-linux.tar.gz newtarr/
               cd ..
             fi
           else

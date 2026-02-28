@@ -13,7 +13,7 @@
             <img src="../images/huntarr-logo.png" alt="NewtArr Logo">
             <h2>NewtArr</h2>
         </div>
-        
+
         <nav class="sidebar-nav">
             <div class="sidebar-section">
                 <h3 class="sidebar-section-title">Core</h3>
@@ -23,7 +23,7 @@
                     <li><a href="../settings/index.html"><svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path></svg> Settings</a></li>
                 </ul>
             </div>
-            
+
             <div class="sidebar-section">
                 <h3 class="sidebar-section-title">Getting Started</h3>
                 <ul>
@@ -32,7 +32,7 @@
                     <li><a href="configuration.html"><svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg> Configuration</a></li>
                 </ul>
             </div>
-            
+
             <div class="sidebar-section">
                 <h3 class="sidebar-section-title">Resources</h3>
                 <ul>
@@ -46,15 +46,15 @@
     <div class="main-content">
         <div class="container">
             <h1>Installation Guide</h1>
-            
+
             <section class="installation-overview">
                 <p>This guide will walk you through the installation process for NewtArr. NewtArr can be installed in several ways depending on your preference and system configuration.</p>
             </section>
-            
+
             <section class="system-requirements">
                 <h2>System Requirements</h2>
                 <p>Before installing NewtArr, ensure your system meets the following requirements:</p>
-                
+
                 <table>
                     <tr>
                         <th>Component</th>
@@ -88,29 +88,29 @@
                     </tr>
                 </table>
             </section>
-            
+
             <section class="installation-methods">
                 <h2>Installation Methods</h2>
                 <p>Choose the installation method that best suits your environment:</p>
-                
+
                 <div class="method-tabs">
                     <div class="tab-buttons">
                         <button class="tab-button active" data-tab="docker">Docker (Recommended)</button>
                         <button class="tab-button" data-tab="script">Installation Script</button>
                         <button class="tab-button" data-tab="manual">Manual Installation</button>
                     </div>
-                    
+
                     <div class="tab-content">
                         <div class="tab-pane active" id="docker">
                             <h3>Docker Installation</h3>
                             <p>The recommended way to install NewtArr is using Docker and Docker Compose. This method ensures that all dependencies are correctly installed and configured.</p>
-                            
+
                             <h4>Prerequisites</h4>
                             <ul>
                                 <li>Docker (19.03 or newer)</li>
                                 <li>Docker Compose (1.27 or newer)</li>
                             </ul>
-                            
+
                             <h4>Steps</h4>
                             <ol>
                                 <li>Clone the repository:
@@ -126,15 +126,15 @@
                                     <pre><code>http://localhost:7575</code></pre>
                                 </li>
                             </ol>
-                            
+
                             <h4>Docker Compose Configuration</h4>
                             <p>The default docker-compose.yml file includes all necessary components, but you can customize it according to your needs. Here's a sample configuration:</p>
-                            
+
                             <pre><code>version: '3'
 services:
   huntarr:
-    image: dhi.io/newtarr:latest
-    container_name: huntarr
+    image: ghcr.io/jabrown93/newtarr:latest
+    container_name: newtarr
     ports:
       - 7575:7575
     volumes:
@@ -147,11 +147,11 @@ services:
       - TZ=UTC
     restart: unless-stopped</code></pre>
                         </div>
-                        
+
                         <div class="tab-pane" id="script">
                             <h3>Installation Script</h3>
                             <p>For Linux systems, we provide a convenient installation script that automates the setup process.</p>
-                            
+
                             <h4>Supported Distributions</h4>
                             <ul>
                                 <li>Ubuntu 18.04, 20.04, 22.04</li>
@@ -159,15 +159,15 @@ services:
                                 <li>CentOS 8, Stream</li>
                                 <li>Fedora 34+</li>
                             </ul>
-                            
+
                             <h4>One-line Installation</h4>
                             <p>Run the following command to install NewtArr:</p>
                             <pre><code>curl -sSL https://install.huntarr.io | bash</code></pre>
-                            
+
                             <h4>Advanced Options</h4>
                             <p>For more control over the installation process, you can use these flags:</p>
                             <pre><code>curl -sSL https://install.huntarr.io | bash -s -- --prefix /opt/huntarr --port 8080</code></pre>
-                            
+
                             <p>Available options:</p>
                             <ul>
                                 <li><code>--prefix</code>: Installation directory (default: /opt/huntarr)</li>
@@ -176,11 +176,11 @@ services:
                                 <li><code>--no-deps</code>: Skip dependency installation</li>
                             </ul>
                         </div>
-                        
+
                         <div class="tab-pane" id="manual">
                             <h3>Manual Installation</h3>
                             <p>If you prefer to install NewtArr manually, follow these steps based on your operating system.</p>
-                            
+
                             <h4>Linux (Ubuntu/Debian)</h4>
                             <ol>
                                 <li>Install dependencies:
@@ -200,7 +200,7 @@ sudo apt install -y nodejs npm git</code></pre>
                                     <pre><code>npm start</code></pre>
                                 </li>
                             </ol>
-                            
+
                             <h4>Windows</h4>
                             <ol>
                                 <li>Install <a href="https://nodejs.org/" target="_blank">Node.js</a></li>
@@ -219,7 +219,7 @@ sudo apt install -y nodejs npm git</code></pre>
                                     <pre><code>npm start</code></pre>
                                 </li>
                             </ol>
-                            
+
                             <h4>macOS</h4>
                             <ol>
                                 <li>Install <a href="https://brew.sh/" target="_blank">Homebrew</a> if you don't have it yet:
@@ -245,10 +245,10 @@ sudo apt install -y nodejs npm git</code></pre>
                     </div>
                 </div>
             </section>
-            
+
             <section class="post-installation">
                 <h2>Post Installation</h2>
-                
+
                 <h3>Initial Setup</h3>
                 <p>After installing NewtArr, you'll need to complete the initial setup:</p>
                 <ol>
@@ -256,40 +256,40 @@ sudo apt install -y nodejs npm git</code></pre>
                     <li>Create an administrator account when prompted</li>
                     <li>Follow the setup wizard to configure your media paths and integrate with media applications (Sonarr, Radarr, etc.)</li>
                 </ol>
-                
+
                 <h3>Updating NewtArr</h3>
                 <p>To update NewtArr to the latest version:</p>
-                
+
                 <h4>Docker Installation</h4>
                 <pre><code>cd /path/to/newtarr
 git pull
 docker-compose pull
 docker-compose up -d</code></pre>
-                
+
                 <h4>Manual Installation</h4>
                 <pre><code>cd /path/to/newtarr
 git pull
 npm install
 npm restart</code></pre>
             </section>
-            
+
             <section class="troubleshooting">
                 <h2>Troubleshooting</h2>
-                
+
                 <h3>Common Issues</h3>
-                
+
                 <div class="issue-card">
                     <h4>Port already in use</h4>
                     <p>If port 7575 is already in use, you can change it in the docker-compose.yml file or use the <code>--port</code> option in the installation script.</p>
                 </div>
-                
+
                 <div class="issue-card">
                     <h4>Permission issues</h4>
                     <p>If you encounter permission issues, make sure the PUID and PGID environment variables in docker-compose.yml match your user's UID and GID.</p>
                     <pre><code># Find your user ID and group ID
 id $(whoami)</code></pre>
                 </div>
-                
+
                 <div class="issue-card">
                     <h4>Connectivity problems</h4>
                     <p>If you can't connect to NewtArr after installation:</p>
@@ -300,30 +300,30 @@ id $(whoami)</code></pre>
                     </ul>
                 </div>
             </section>
-            
+
             <div class="section-nav">
                 <a href="../index.html">← Back to Home</a>
                 <a href="quick-setup.html">Quick Setup Guide →</a>
             </div>
-            
+
             <footer>
                 NewtArr | Installation Guide
             </footer>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Tab functionality
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabPanes = document.querySelectorAll('.tab-pane');
-            
+
             tabButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     // Remove active class from all buttons and panes
                     tabButtons.forEach(btn => btn.classList.remove('active'));
                     tabPanes.forEach(pane => pane.classList.remove('active'));
-                    
+
                     // Add active class to current button and corresponding pane
                     this.classList.add('active');
                     const tabId = this.getAttribute('data-tab');
@@ -333,4 +333,4 @@ id $(whoami)</code></pre>
         });
     </script>
 </body>
-</html> 
+</html>
