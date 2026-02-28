@@ -635,7 +635,7 @@ let huntarrUI = {
             // Set the iframe source when switching to this section
             const sponsorsFrame = document.getElementById('sponsorsFrame');
             if (sponsorsFrame && (!sponsorsFrame.src || sponsorsFrame.src === 'about:blank')) { // Set src only if not already set or blank
-                sponsorsFrame.src = 'https://github.com/sponsors/plexguide';
+                sponsorsFrame.src = 'about:blank';
             }
             // Disconnect logs if switching away from logs
             this.disconnectAllEventSources();
@@ -890,17 +890,18 @@ let huntarrUI = {
                     if (match) {
                         const [, appName, timestamp, loggerName, level, message] = match;
                         
-                        logEntry.innerHTML = ` 
-                            <span class="log-timestamp" title="${timestamp}">${timestamp.split(' ')[1]}</span> 
-                            ${appName ? `<span class="log-app" title="Source: ${appName}">[${appName}]</span>` : ''}
-                            <span class="log-level log-level-${level.toLowerCase()}" title="Level: ${level}">${level}</span>
-                            <span class="log-logger" title="Logger: ${loggerName}">(${loggerName.replace('huntarr.', '')})</span>
-                            <span class="log-message">${message}</span>
+                        const esc = HuntarrUtils.escapeHtml;
+                        logEntry.innerHTML = `
+                            <span class="log-timestamp" title="${esc(timestamp)}">${esc(timestamp.split(' ')[1])}</span>
+                            ${appName ? `<span class="log-app" title="Source: ${esc(appName)}">[${esc(appName)}]</span>` : ''}
+                            <span class="log-level log-level-${esc(level.toLowerCase())}" title="Level: ${esc(level)}">${esc(level)}</span>
+                            <span class="log-logger" title="Logger: ${esc(loggerName)}">(${esc(loggerName.replace('huntarr.', ''))})</span>
+                            <span class="log-message">${esc(message)}</span>
                         `;
                         logEntry.classList.add(`log-${level.toLowerCase()}`);
                     } else {
                         // Fallback for lines that don't match the expected format
-                        logEntry.innerHTML = `<span class="log-message">${logString}</span>`;
+                        logEntry.innerHTML = `<span class="log-message">${HuntarrUtils.escapeHtml(logString)}</span>`;
                         
                         // Basic level detection for fallback
                         if (logString.includes('ERROR')) logEntry.classList.add('log-error');
@@ -2063,7 +2064,7 @@ let huntarrUI = {
         try {
             const requestBody = appType ? { app_type: appType } : {};
             
-            HuntarrUtils.fetchWithTimeout('/api/stats/reset_public', {
+            HuntarrUtils.fetchWithTimeout('/api/stats/reset', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2240,7 +2241,7 @@ let huntarrUI = {
         starsElement.textContent = 'Loading...';
         
         // GitHub API endpoint for repository information
-        const apiUrl = 'https://api.github.com/repos/plexguide/huntarr';
+        const apiUrl = 'https://api.github.com/repos/jabrown93/newtarr';
         
         HuntarrUtils.fetchWithTimeout(apiUrl)
             .then(response => {

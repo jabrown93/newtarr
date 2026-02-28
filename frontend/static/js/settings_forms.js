@@ -935,15 +935,15 @@ const SettingsForms = {
             })
             .catch(error => {
                 console.error('Error loading Swaparr status:', error);
-                statusContainer.innerHTML = `<p>Error fetching status: ${error.message}</p>`;
+                statusContainer.innerHTML = `<p>Error fetching status: ${HuntarrUtils.escapeHtml(error.message)}</p>`;
             });
-            
+
         // Add event listener for the Reset Strikes button
         if (resetStrikesBtn) {
             resetStrikesBtn.addEventListener('click', function() {
                 if (confirm('Are you sure you want to reset all Swaparr strikes? This will clear the strike history for all apps.')) {
                     statusContainer.innerHTML = '<p>Resetting strikes...</p>';
-                    
+
                     fetch('/api/swaparr/reset', {
                         method: 'POST',
                         headers: {
@@ -954,7 +954,7 @@ const SettingsForms = {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            statusContainer.innerHTML = `<p>Success: ${data.message}</p>`;
+                            statusContainer.innerHTML = `<p>Success: ${HuntarrUtils.escapeHtml(data.message)}</p>`;
                             // Reload status after a short delay
                             setTimeout(() => {
                                 fetch('/api/swaparr/status')
@@ -964,11 +964,12 @@ const SettingsForms = {
                                         if (data.statistics && Object.keys(data.statistics).length > 0) {
                                             statusHTML += '<ul>';
                                             for (const [app, stats] of Object.entries(data.statistics)) {
-                                                statusHTML += `<li><strong>${app.toUpperCase()}</strong>: `;
+                                                const esc = HuntarrUtils.escapeHtml;
+                                                statusHTML += `<li><strong>${esc(app.toUpperCase())}</strong>: `;
                                                 if (stats.error) {
-                                                    statusHTML += `Error: ${stats.error}</li>`;
+                                                    statusHTML += `Error: ${esc(stats.error)}</li>`;
                                                 } else {
-                                                    statusHTML += `${stats.currently_striked} currently striked, ${stats.removed} removed (${stats.total_tracked} total tracked)</li>`;
+                                                    statusHTML += `${esc(stats.currently_striked)} currently striked, ${esc(stats.removed)} removed (${esc(stats.total_tracked)} total tracked)</li>`;
                                                 }
                                             }
                                             statusHTML += '</ul>';
@@ -979,11 +980,11 @@ const SettingsForms = {
                                     });
                             }, 1000);
                         } else {
-                            statusContainer.innerHTML = `<p>Error: ${data.message}</p>`;
+                            statusContainer.innerHTML = `<p>Error: ${HuntarrUtils.escapeHtml(data.message)}</p>`;
                         }
                     })
                     .catch(error => {
-                        statusContainer.innerHTML = `<p>Error resetting strikes: ${error.message}</p>`;
+                        statusContainer.innerHTML = `<p>Error resetting strikes: ${HuntarrUtils.escapeHtml(error.message)}</p>`;
                     });
                 }
             });

@@ -240,7 +240,7 @@ const appsModule = {
             })
             .catch(error => {
                 console.error(`Error loading ${app} settings:`, error);
-                appPanel.innerHTML = `<div class="error-panel"><i class="fas fa-exclamation-triangle"></i> Error loading settings: ${error.message}</div>`;
+                appPanel.innerHTML = `<div class="error-panel"><i class="fas fa-exclamation-triangle"></i> Error loading settings: ${HuntarrUtils.escapeHtml(error.message)}</div>`;
             });
     },
     

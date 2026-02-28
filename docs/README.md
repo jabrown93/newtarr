@@ -1,6 +1,6 @@
-# Huntarr.io Documentation
+# NewtArr Documentation
 
-This directory contains the official documentation for the Huntarr.io project, which is automatically published to [https://plexguide.github.io/Huntarr.io/docs](https://plexguide.github.io/Huntarr.io/docs).
+This directory contains the official documentation for the NewtArr project, which is automatically published to [https://jabrown93.github.io/newtarr/docs](https://jabrown93.github.io/newtarr/docs).
 
 ## Structure
 
@@ -19,7 +19,7 @@ To contribute to the documentation:
 To test documentation locally, you can use Python's built-in HTTP server:
 
 ```bash
-cd /path/to/Huntarr.io/docs
+cd /path/to/newtarr/docs
 python -m http.server 8000
 ```
 

@@ -57,67 +57,57 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.DEBUG)  # Change to DEBUG to see all Flask/Werkzeug logs
 
 # Configure template and static paths with proper PyInstaller support
-# Check if we're running from a PyInstaller bundle
-print("==== HUNTARR TEMPLATE DEBUG ====")
-print(f"__file__: {__file__}")
-print(f"sys.executable: {sys.executable}")
-print(f"os.getcwd(): {os.getcwd()}")
-print(f"sys.path: {sys.path}")
-print(f"Is frozen: {getattr(sys, 'frozen', False)}")
+_web_init_logger = logging.getLogger('web_server')
 
 if getattr(sys, 'frozen', False):
     # We're running from the bundled package
     bundle_dir = os.path.dirname(sys.executable)
-    # Override the template and static directories
     template_dir = os.path.join(bundle_dir, 'templates')
     static_dir = os.path.join(bundle_dir, 'static')
-    print(f"PyInstaller mode - Using templates dir: {template_dir}")
-    print(f"PyInstaller mode - Using static dir: {static_dir}")
-    print(f"Template dir exists: {os.path.exists(template_dir)}")
-    if os.path.exists(template_dir):
-        print(f"Template dir contents: {os.listdir(template_dir)}")
+    _web_init_logger.debug(f"PyInstaller mode - templates: {template_dir}, static: {static_dir}")
 else:
     # Normal development mode - use relative paths
     template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'frontend', 'templates'))
     static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'frontend', 'static'))
-    print(f"Normal mode - Using templates dir: {template_dir}")
-    print(f"Normal mode - Using static dir: {static_dir}")
-    print(f"Template dir exists: {os.path.exists(template_dir)}")
-    if os.path.exists(template_dir):
-        print(f"Template dir contents: {os.listdir(template_dir)}")
+    _web_init_logger.debug(f"Dev mode - templates: {template_dir}, static: {static_dir}")
 
-# Create Flask app with additional debug logging
+# Create Flask app
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
-print(f"Flask app created with template_folder: {app.template_folder}")
-print(f"Flask app created with static_folder: {app.static_folder}")
 
-# Add debug logging for template rendering
-def debug_template_rendering():
-    """Additional logging for Flask template rendering"""
-    app.jinja_env.auto_reload = True
-    orig_get_source = app.jinja_env.loader.get_source
-    
-    def get_source_wrapper(environment, template):
-        try:
-            result = orig_get_source(environment, template)
-            print(f"Template loaded successfully: {template}")
-            return result
-        except Exception as e:
-            print(f"Error loading template {template}: {e}")
-            print(f"Loader search paths: {environment.loader.searchpath}")
-            # Print all available templates
-            try:
-                all_templates = environment.loader.list_templates()
-                print(f"Available templates: {all_templates}")
-            except:
-                print("Could not list available templates")
-            raise
-    
-    app.jinja_env.loader.get_source = get_source_wrapper
-    
-debug_template_rendering()
+def _get_or_create_secret_key() -> str:
+    """Get the secret key from env var, persisted file, or generate a new one."""
+    env_key = os.environ.get('SECRET_KEY')
+    if env_key:
+        return env_key
 
-app.secret_key = os.environ.get('SECRET_KEY', 'dev_key_for_sessions')
+    secret_key_path = '/config/settings/.secret_key'
+    try:
+        if os.path.exists(secret_key_path):
+            with open(secret_key_path, 'r') as f:
+                key = f.read().strip()
+                if key:
+                    return key
+    except Exception as e:
+        logging.getLogger('web_server').warning(f"Could not read secret key file: {e}")
+
+    # Generate a new random key and persist it
+    import secrets as _secrets
+    key = _secrets.token_hex(32)
+    try:
+        os.makedirs(os.path.dirname(secret_key_path), exist_ok=True)
+        with open(secret_key_path, 'w') as f:
+            f.write(key)
+        os.chmod(secret_key_path, 0o600)
+    except Exception as e:
+        logging.getLogger('web_server').warning(f"Could not persist secret key: {e}")
+
+    logging.getLogger('web_server').warning(
+        "SECRET_KEY env var not set. Using auto-generated key persisted to /config/settings/.secret_key. "
+        "Set SECRET_KEY in your environment for production deployments."
+    )
+    return key
+
+app.secret_key = _get_or_create_secret_key()
 
 # Register blueprints
 app.register_blueprint(common_bp)
@@ -134,6 +124,23 @@ app.register_blueprint(scheduler_api)
 
 # Register the authentication check to run before requests
 app.before_request(authenticate_request)
+
+@app.after_request
+def set_security_headers(response):
+    """Add security headers to all responses."""
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+        "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; "
+        "img-src 'self' data: https:; "
+        "connect-src 'self' https://api.github.com; "
+        "frame-src 'none'"
+    )
+    return response
 
 # Removed MAIN_PID and signal-related code
 
@@ -554,10 +561,16 @@ def api_app_settings():
         return jsonify({"success": False, "error": f"Invalid or missing app type: {app_type}"}), 400
 
     # Get API credentials using the updated settings_manager function
-    # api_details = settings_manager.get_api_details(app_type) # Function does not exist
     api_url = settings_manager.get_api_url(app_type)
     api_key = settings_manager.get_api_key(app_type)
-    api_details = {"api_url": api_url, "api_key": api_key}
+    # Mask API key for frontend display - actual API calls are made server-side
+    masked_key = ""
+    if api_key:
+        if len(api_key) > 8:
+            masked_key = api_key[:4] + "****" + api_key[-4:]
+        else:
+            masked_key = "****"
+    api_details = {"api_url": api_url, "api_key": masked_key}
     return jsonify({"success": True, **api_details})
 
 @app.route('/api/configured-apps', methods=['GET'])
@@ -821,36 +834,6 @@ def api_get_hourly_caps():
             "success": False,
             "message": "Error retrieving hourly API caps."
         }), 500
-
-@app.route('/api/stats/reset_public', methods=['POST'])
-def api_reset_stats_public():
-    """Reset the media statistics for all apps or a specific app - public endpoint without auth"""
-    try:
-        data = request.json or {}
-        app_type = data.get('app_type')
-        
-        # Get logger for logging the reset action
-        web_logger = get_logger("web_server")
-        
-        # Import the reset_stats function
-        from src.primary.stats_manager import reset_stats
-        
-        if app_type:
-            web_logger.info(f"Resetting statistics for app (public): {app_type}")
-            reset_success = reset_stats(app_type)
-        else:
-            web_logger.info("Resetting all media statistics (public)")
-            reset_success = reset_stats(None)
-        
-        if reset_success:
-            return jsonify({"success": True, "message": "Statistics reset successfully"}), 200
-        else:
-            return jsonify({"success": False, "error": "Failed to reset statistics"}), 500
-        
-    except Exception as e:
-        web_logger = get_logger("web_server")
-        web_logger.error(f"Error resetting statistics (public): {str(e)}")
-        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/version.txt')
 def version_txt():

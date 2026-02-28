@@ -205,14 +205,15 @@
                 }
                 
                 // Update the panel content
+                const escCfg = HuntarrUtils.escapeHtml;
                 configPanel.innerHTML = `
                     <div class="swaparr-config">
-                        <h3>Swaparr${this.logData.config.platform ? ' — ' + this.logData.config.platform : ''}</h3>
+                        <h3>Swaparr${this.logData.config.platform ? ' — ' + escCfg(this.logData.config.platform) : ''}</h3>
                         <div class="swaparr-config-content">
-                            <span>Max strikes: ${this.logData.config.maxStrikes}</span>
-                            <span>Scan interval: ${this.logData.config.scanInterval}</span>
-                            <span>Max download time: ${this.logData.config.maxDownloadTime}</span>
-                            <span>Ignore above size: ${this.logData.config.ignoreAboveSize}</span>
+                            <span>Max strikes: ${escCfg(this.logData.config.maxStrikes)}</span>
+                            <span>Scan interval: ${escCfg(this.logData.config.scanInterval)}</span>
+                            <span>Max download time: ${escCfg(this.logData.config.maxDownloadTime)}</span>
+                            <span>Ignore above size: ${escCfg(this.logData.config.ignoreAboveSize)}</span>
                         </div>
                     </div>
                 `;
@@ -255,23 +256,24 @@
                 
                 // Add each download as a row
                 this.logData.downloads.forEach(download => {
+                    const esc = HuntarrUtils.escapeHtml;
                     // Apply status-specific CSS class
                     let statusClass = download.status.toLowerCase();
-                    
+
                     // Normalize some status values
                     if (statusClass === 'pending removal') statusClass = 'pending';
                     if (statusClass === 'removed') statusClass = 'removed';
                     if (statusClass === 'striked') statusClass = 'striked';
                     if (statusClass === 'normal') statusClass = 'normal';
                     if (statusClass === 'ignored') statusClass = 'ignored';
-                    
+
                     tableHTML += `
-                        <tr class="swaparr-status-${statusClass}">
-                            <td>${download.strikes}</td>
-                            <td>${download.status}</td>
-                            <td>${download.name}</td>
-                            <td>${download.size}</td>
-                            <td>${download.eta}</td>
+                        <tr class="swaparr-status-${esc(statusClass)}">
+                            <td>${esc(download.strikes)}</td>
+                            <td>${esc(download.status)}</td>
+                            <td>${esc(download.name)}</td>
+                            <td>${esc(download.size)}</td>
+                            <td>${esc(download.eta)}</td>
                         </tr>
                     `;
                 });
@@ -309,7 +311,7 @@
             for (const logLine of this.logData.rawLogs) {
                 const logEntry = document.createElement('div');
                 logEntry.className = 'log-entry';
-                logEntry.innerHTML = `<span class="log-message">${logLine}</span>`;
+                logEntry.innerHTML = `<span class="log-message">${HuntarrUtils.escapeHtml(logLine)}</span>`;
                 
                 // Basic level detection
                 if (logLine.includes('ERROR')) logEntry.classList.add('log-error');

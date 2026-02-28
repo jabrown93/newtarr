@@ -5,6 +5,7 @@ import datetime, os, requests
 from src.primary import keys_manager
 from src.primary.state import get_state_file_path, reset_state_file
 from src.primary.utils.logger import get_logger, APP_LOG_FILES
+from src.primary.utils.url_validation import validate_url
 from src.primary.settings_manager import load_settings, get_ssl_verify_setting
 import traceback
 import socket
@@ -30,7 +31,12 @@ def test_connection(url, api_key):
         error_msg = "API URL must start with http:// or https://"
         eros_logger.error(error_msg)
         return {"success": False, "message": error_msg}
-    
+
+    # SSRF protection
+    url_valid, url_error = validate_url(url)
+    if not url_valid:
+        return {"success": False, "message": url_error}
+
     # Try to establish a socket connection first to check basic connectivity
     parsed_url = urlparse(url)
     hostname = parsed_url.hostname

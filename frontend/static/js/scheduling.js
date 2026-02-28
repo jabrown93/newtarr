@@ -681,14 +681,15 @@ function renderSchedules() {
         }
         
         // Build the schedule item HTML (checkbox removed but layout preserved)
+        const esc = HuntarrUtils.escapeHtml;
         scheduleItem.innerHTML = `
             <div class="schedule-item-checkbox"></div>
-            <div class="schedule-item-time">${formattedTime}</div>
-            <div class="schedule-item-days">${daysText}</div>
-            <div class="schedule-item-action">${actionText}</div>
-            <div class="schedule-item-app">${appText}</div>
+            <div class="schedule-item-time">${esc(formattedTime)}</div>
+            <div class="schedule-item-days">${esc(daysText)}</div>
+            <div class="schedule-item-action">${esc(actionText)}</div>
+            <div class="schedule-item-app">${esc(appText)}</div>
             <div class="schedule-item-actions">
-                <button class="icon-button delete-schedule" data-id="${schedule.id}" data-app-type="${schedule.appType}"><i class="fas fa-trash"></i></button>
+                <button class="icon-button delete-schedule" data-id="${esc(schedule.id)}" data-app-type="${esc(schedule.appType)}"><i class="fas fa-trash"></i></button>
             </div>
         `;
         

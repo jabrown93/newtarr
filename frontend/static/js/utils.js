@@ -53,15 +53,33 @@ const HuntarrUtils = {
     getApiTimeout: function() {
         // Default value
         let timeout = 120;
-        
+
         // Try to get from global settings
-        if (window.huntarrUI && window.huntarrUI.originalSettings && 
-            window.huntarrUI.originalSettings.general && 
+        if (window.huntarrUI && window.huntarrUI.originalSettings &&
+            window.huntarrUI.originalSettings.general &&
             window.huntarrUI.originalSettings.general.api_timeout) {
             timeout = window.huntarrUI.originalSettings.general.api_timeout;
         }
-        
+
         return timeout;
+    },
+
+    /**
+     * Escape HTML special characters to prevent XSS
+     * @param {string} text - The text to escape
+     * @returns {string} - The escaped text
+     */
+    escapeHtml: function(text) {
+        if (text === null || text === undefined) return '';
+        const str = String(text);
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return str.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 };
 

@@ -52,11 +52,11 @@ def arr_request(api_url: str, api_key: str, api_timeout: int, endpoint: str, met
         
         eros_logger.debug(f"Making {method} request to: {full_url}")
         
-        # Set up headers with User-Agent to identify Huntarr
+        # Set up headers with User-Agent to identify NewtArr
         headers = {
             "X-Api-Key": api_key,
             "Content-Type": "application/json",
-            "User-Agent": "Huntarr/1.0 (https://github.com/plexguide/Huntarr.io)"
+            "User-Agent": "NewtArr/1.0 (https://github.com/jabrown93/newtarr)"
         }
         
         # Get SSL verification setting

@@ -5,6 +5,7 @@ import datetime, os, requests
 from src.primary import keys_manager
 from src.primary.state import get_state_file_path, reset_state_file
 from src.primary.utils.logger import get_logger
+from src.primary.utils.url_validation import validate_url
 from src.primary.settings_manager import get_ssl_verify_setting
 import traceback
 import socket
@@ -36,6 +37,11 @@ def test_connection():
         error_msg = "API URL must start with http:// or https://"
         sonarr_logger.error(error_msg)
         return jsonify({"success": False, "message": error_msg}), 400
+
+    # SSRF protection: block cloud metadata and internal-only addresses
+    url_valid, url_error = validate_url(api_url)
+    if not url_valid:
+        return jsonify({"success": False, "message": url_error}), 400
     
     # Try to establish a socket connection first to check basic connectivity
     parsed_url = urlparse(api_url)

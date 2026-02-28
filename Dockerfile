@@ -1,4 +1,4 @@
-FROM python:3.14-slim
+FROM dhi.io/python:3.14.3
 
 WORKDIR /app
 
@@ -14,16 +14,27 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . /app/
 
-# Create necessary directories
-RUN mkdir -p /config/settings /config/stateful /config/user /config/logs
-RUN chmod -R 755 /config
+# Create non-root user
+RUN groupadd -g 1000 newtarr && \
+    useradd -u 1000 -g newtarr -s /bin/sh -M newtarr
+
+# Create necessary directories with owner-only permissions
+RUN mkdir -p /config/settings /config/stateful /config/user /config/logs && \
+    chown -R newtarr:newtarr /config && \
+    chmod -R 700 /config
 
 # Set environment variables
 ENV PYTHONPATH=/app
-# ENV APP_TYPE=sonarr # APP_TYPE is likely managed via config now, remove if not needed
 
 # Expose port
 EXPOSE 9705
+
+# Health check using the existing /api/health endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:9705/api/health')" || exit 1
+
+# Run as non-root user
+USER newtarr
 
 # Run the main application using the new entry point
 CMD ["python3", "main.py"]
