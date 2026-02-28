@@ -7,6 +7,11 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
+# Prepare /config directory tree with correct ownership and permissions
+RUN mkdir -p /config/settings /config/stateful /config/user /config/logs && \
+    chown -R 1000:1000 /config && \
+    chmod -R 700 /config
+
 # Final stage: minimal runtime image
 FROM dhi.io/python:3.14.3
 
@@ -15,15 +20,11 @@ WORKDIR /app
 # Copy installed Python packages from builder
 COPY --from=builder /install /usr/local
 
+# Copy pre-created config directory with correct ownership
+COPY --from=builder --chown=65532:65532 /config /config
+
 # Copy application code
 COPY . /app/
-
-# Create necessary directories with owner-only permissions
-# The base image provides a non-root user (uid 1000) — use numeric IDs
-# since the minimal image may not have usermod/groupadd
-RUN mkdir -p /config/settings /config/stateful /config/user /config/logs && \
-    chown -R 1000:1000 /config && \
-    chmod -R 700 /config
 
 # Set environment variables
 ENV PYTHONPATH=/app
@@ -34,9 +35,6 @@ EXPOSE 9705
 # Health check using the existing /api/health endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:9705/api/health')" || exit 1
-
-# Run as non-root user
-USER 1000
 
 # Run the main application using the new entry point
 CMD ["python3", "main.py"]
