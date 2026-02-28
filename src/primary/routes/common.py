@@ -61,9 +61,8 @@ def login_route():
             if auth_success:
                 # User is authenticated (password correct, and 2FA if needed was correct)
                 session_token = create_session(username)
-                session[SESSION_COOKIE_NAME] = session_token # Store token in Flask session immediately
+                session[SESSION_COOKIE_NAME] = session_token # Store token in Flask session
                 response = jsonify({"success": True, "redirect": "/"}) # Add redirect URL
-                response.set_cookie(SESSION_COOKIE_NAME, session_token, httponly=True, samesite='Lax', path='/', secure=not os.environ.get('DEBUG', 'false').lower() == 'true')
                 logger.info(f"User '{username}' logged in successfully.")
                 return response
             elif needs_2fa:
@@ -102,18 +101,16 @@ def login_route():
 @common_bp.route('/logout', methods=['POST'])
 def logout_route():
     try:
-        session_token = request.cookies.get(SESSION_COOKIE_NAME)
+        session_token = session.get(SESSION_COOKIE_NAME)
         if session_token:
             logger.info(f"Logging out session token: {session_token[:8]}...") # Log part of token
             logout(session_token) # Call the logout function from auth.py
         else:
-            logger.warning("Logout attempt without session cookie.")
+            logger.warning("Logout attempt without session token.")
 
-        response = jsonify({"success": True})
-        # Ensure cookie deletion happens even if logout function had issues
-        response.delete_cookie(SESSION_COOKIE_NAME, path='/', samesite='Lax') # Specify path and samesite
-        logger.info("Logout successful, cookie deleted.")
-        return response
+        session.pop(SESSION_COOKIE_NAME, None)
+        logger.info("Logout successful, session cleared.")
+        return jsonify({"success": True})
     except Exception as e:
         logger.error(f"Error during logout: {e}", exc_info=True)
         # Return a JSON error response
@@ -175,11 +172,8 @@ def setup():
                 session_token = create_session(username)
                 # Explicitly set username in Flask session - might not be needed if using token correctly
                 # session['username'] = username
-                session[SESSION_COOKIE_NAME] = session_token # Store token in session
-                response = jsonify({"success": True})
-                # Set cookie in the response
-                response.set_cookie(SESSION_COOKIE_NAME, session_token, httponly=True, samesite='Lax', path='/', secure=not os.environ.get('DEBUG', 'false').lower() == 'true')
-                return response
+                session[SESSION_COOKIE_NAME] = session_token # Store token in Flask session
+                return jsonify({"success": True})
             else:
                 # create_user itself failed, but didn't raise an exception
                 logger.error(f"create_user function returned False for user '{username}' during setup.")
@@ -198,7 +192,7 @@ def setup():
 @common_bp.route('/api/user/info', methods=['GET'])
 def get_user_info_route():
     # Use session token to get username
-    session_token = request.cookies.get(SESSION_COOKIE_NAME)
+    session_token = session.get(SESSION_COOKIE_NAME)
     username = get_username_from_session(session_token) # Use auth function
 
     if not username:
@@ -213,7 +207,7 @@ def get_user_info_route():
 @common_bp.route('/api/user/change-username', methods=['POST'])
 def change_username_route():
     # Use session token to get username
-    session_token = request.cookies.get(SESSION_COOKIE_NAME)
+    session_token = session.get(SESSION_COOKIE_NAME)
     current_username = get_username_from_session(session_token)
 
     if not current_username:
@@ -248,7 +242,7 @@ def change_username_route():
 @common_bp.route('/api/user/change-password', methods=['POST'])
 def change_password_route():
     # Use session token to get username - needed? change_password might not need it if single user
-    session_token = request.cookies.get(SESSION_COOKIE_NAME)
+    session_token = session.get(SESSION_COOKIE_NAME)
     username = get_username_from_session(session_token) # Get username for logging
 
     if not username: # Check if session is valid even if function doesn't need username
@@ -277,7 +271,7 @@ def change_password_route():
 @common_bp.route('/api/user/2fa/setup', methods=['POST'])
 def setup_2fa():
     # Use session token to get username
-    session_token = request.cookies.get(SESSION_COOKIE_NAME)
+    session_token = session.get(SESSION_COOKIE_NAME)
     username = get_username_from_session(session_token)
 
     if not username:
@@ -299,7 +293,7 @@ def setup_2fa():
 @common_bp.route('/api/user/2fa/verify', methods=['POST'])
 def verify_2fa():
     # Use session token to get username
-    session_token = request.cookies.get(SESSION_COOKIE_NAME)
+    session_token = session.get(SESSION_COOKIE_NAME)
     username = get_username_from_session(session_token)
 
     if not username:
@@ -325,7 +319,7 @@ def verify_2fa():
 
 @common_bp.route('/api/user/2fa/disable', methods=['POST'])
 def disable_2fa_route():
-    session_token = request.cookies.get(SESSION_COOKIE_NAME)
+    session_token = session.get(SESSION_COOKIE_NAME)
     username = get_username_from_session(session_token)
 
     if not username:
@@ -360,7 +354,7 @@ def disable_2fa_route():
 @common_bp.route('/api/settings/theme', methods=['POST'])
 def set_theme():
     # Authentication check
-    session_token = request.cookies.get(SESSION_COOKIE_NAME)
+    session_token = session.get(SESSION_COOKIE_NAME)
     if not verify_session(session_token):
          logger.warning("Theme setting attempt failed: Not authenticated.")
          return jsonify({"error": "Unauthorized"}), 401
@@ -436,7 +430,7 @@ def reset_stats_api():
         from ..stats_manager import reset_stats
         
         # Check if authenticated
-        session_token = request.cookies.get(SESSION_COOKIE_NAME)
+        session_token = session.get(SESSION_COOKIE_NAME)
         if not verify_session(session_token):
             logger.warning("Stats reset attempt failed: Not authenticated.")
             return jsonify({"error": "Unauthorized"}), 401
