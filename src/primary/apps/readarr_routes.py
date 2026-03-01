@@ -5,10 +5,9 @@ import datetime, os, requests
 from src.primary import keys_manager
 from src.primary.state import get_state_file_path, reset_state_file
 from src.primary.utils.logger import get_logger
-from src.primary.utils.url_validation import validate_url
+from src.primary.utils.url_validation import validate_url, make_validated_request
 from src.primary.settings_manager import get_ssl_verify_setting
 import traceback
-import socket
 from urllib.parse import urlparse
 
 readarr_bp = Blueprint('readarr', __name__)
@@ -37,7 +36,7 @@ def test_connection():
         return jsonify({"success": False, "message": error_msg}), 400
 
     # SSRF protection
-    url_valid, url_error = validate_url(api_url)
+    url_valid, url_error, resolved_ip = validate_url(api_url)
     if not url_valid:
         return jsonify({"success": False, "message": url_error}), 400
 
@@ -47,40 +46,16 @@ def test_connection():
         "X-Api-Key": api_key,
         "Content-Type": "application/json"
     }
-    
+
     # Get SSL verification setting
     verify_ssl = get_ssl_verify_setting()
-    
+
     if not verify_ssl:
         readarr_logger.debug("SSL verification disabled by user setting for connection test")
-    
+
     try:
-        # First check if the host is reachable at all
-        parsed_url = urlparse(api_url)
-        hostname = parsed_url.hostname
-        port = parsed_url.port or (443 if parsed_url.scheme == 'https' else 80)
-        
-        # Try to establish a socket connection first to provide a better error message for connection issues
-        try:
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(3)  # Short timeout for quick feedback
-            result = sock.connect_ex((hostname, port))
-            sock.close()
-            
-            if result != 0:
-                error_msg = f"Connection refused - Unable to connect to {hostname}:{port}. Please check if the server is running and the port is correct."
-                readarr_logger.error(error_msg)
-                return jsonify({"success": False, "message": error_msg}), 404
-        except socket.gaierror:
-            error_msg = f"DNS resolution failed - Cannot resolve hostname: {hostname}. Please check your URL."
-            readarr_logger.error(error_msg)
-            return jsonify({"success": False, "message": error_msg}), 404
-        except Exception as e:
-            # Log the socket testing error but continue with the full request
-            readarr_logger.debug(f"Socket test error, continuing with full request: {str(e)}")
-            
-        # Now proceed with the actual API request
-        response = requests.get(url, headers=headers, timeout=10, verify=verify_ssl)
+        # Proceed with the actual API request, pinned to the resolved IP
+        response = make_validated_request(url, resolved_ip, headers=headers, timeout=10, verify=verify_ssl)
         
         # For HTTP errors, provide more specific feedback
         if response.status_code == 401:

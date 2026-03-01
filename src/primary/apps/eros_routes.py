@@ -5,11 +5,9 @@ import datetime, os, requests
 from src.primary import keys_manager
 from src.primary.state import get_state_file_path, reset_state_file
 from src.primary.utils.logger import get_logger, APP_LOG_FILES
-from src.primary.utils.url_validation import validate_url
+from src.primary.utils.url_validation import validate_url, make_validated_request
 from src.primary.settings_manager import load_settings, get_ssl_verify_setting
 import traceback
-import socket
-from urllib.parse import urlparse
 from src.primary.apps.eros import api as eros_api
 
 eros_bp = Blueprint('eros', __name__)
@@ -33,34 +31,10 @@ def test_connection(url, api_key):
         return {"success": False, "message": error_msg}
 
     # SSRF protection
-    url_valid, url_error = validate_url(url)
+    url_valid, url_error, resolved_ip = validate_url(url)
     if not url_valid:
         return {"success": False, "message": url_error}
 
-    # Try to establish a socket connection first to check basic connectivity
-    parsed_url = urlparse(url)
-    hostname = parsed_url.hostname
-    port = parsed_url.port or (443 if parsed_url.scheme == 'https' else 80)
-    
-    try:
-        # Try socket connection for quick feedback on connectivity issues
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(3)  # Short timeout for quick feedback
-        result = sock.connect_ex((hostname, port))
-        sock.close()
-        
-        if result != 0:
-            error_msg = f"Connection refused - Unable to connect to {hostname}:{port}. Please check if the server is running and the port is correct."
-            eros_logger.error(error_msg)
-            return {"success": False, "message": error_msg}
-    except socket.gaierror:
-        error_msg = f"DNS resolution failed - Cannot resolve hostname: {hostname}. Please check your URL."
-        eros_logger.error(error_msg)
-        return {"success": False, "message": error_msg}
-    except Exception as e:
-        # Log the socket testing error but continue with the full request
-        eros_logger.debug(f"Socket test error, continuing with full request: {str(e)}")
-    
     # For Eros, we only use v3 API path
     api_url = f"{url.rstrip('/')}/api/v3/system/status"
     headers = {'X-Api-Key': api_key}
@@ -74,7 +48,7 @@ def test_connection(url, api_key):
     try:
         # Make the request with appropriate timeouts
         eros_logger.debug(f"Trying API path: {api_url}")
-        response = requests.get(api_url, headers=headers, timeout=(5, 30), verify=verify_ssl)
+        response = make_validated_request(api_url, resolved_ip, headers=headers, timeout=(5, 30), verify=verify_ssl)
         
         try:
             response.raise_for_status()

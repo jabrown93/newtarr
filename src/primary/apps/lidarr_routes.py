@@ -5,10 +5,9 @@ import datetime, os, requests
 from src.primary import keys_manager
 from src.primary.state import get_state_file_path, reset_state_file
 from src.primary.utils.logger import get_logger
-from src.primary.utils.url_validation import validate_url
+from src.primary.utils.url_validation import validate_url, make_validated_request
 from src.primary.settings_manager import get_ssl_verify_setting
 import traceback
-import socket
 from urllib.parse import urlparse
 
 lidarr_bp = Blueprint('lidarr', __name__)
@@ -38,34 +37,10 @@ def test_connection():
         return jsonify({"success": False, "message": error_msg}), 400
 
     # SSRF protection
-    url_valid, url_error = validate_url(api_url)
+    url_valid, url_error, resolved_ip = validate_url(api_url)
     if not url_valid:
         return jsonify({"success": False, "message": url_error}), 400
 
-    # Try to establish a socket connection first to check basic connectivity
-    parsed_url = urlparse(api_url)
-    hostname = parsed_url.hostname
-    port = parsed_url.port or (443 if parsed_url.scheme == 'https' else 80)
-    
-    try:
-        # Try socket connection for quick feedback on connectivity issues
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(3)  # Short timeout for quick feedback
-        result = sock.connect_ex((hostname, port))
-        sock.close()
-        
-        if result != 0:
-            error_msg = f"Connection refused - Unable to connect to {hostname}:{port}. Please check if the server is running and the port is correct."
-            lidarr_logger.error(error_msg)
-            return jsonify({"success": False, "message": error_msg}), 404
-    except socket.gaierror:
-        error_msg = f"DNS resolution failed - Cannot resolve hostname: {hostname}. Please check your URL."
-        lidarr_logger.error(error_msg)
-        return jsonify({"success": False, "message": error_msg}), 404
-    except Exception as e:
-        # Log the socket testing error but continue with the full request
-        lidarr_logger.debug(f"Socket test error, continuing with full request: {str(e)}")
-    
     # For Lidarr, use api/v1
     url = f"{api_url.rstrip('/')}/api/v1/system/status"
     headers = {
@@ -80,7 +55,7 @@ def test_connection():
         lidarr_logger.debug("SSL verification disabled by user setting for connection test")
     
     try:
-        response = requests.get(url, headers=headers, timeout=(10, api_timeout), verify=verify_ssl)
+        response = make_validated_request(url, resolved_ip, headers=headers, timeout=(10, api_timeout), verify=verify_ssl)
         
         # For HTTP errors, provide more specific feedback
         if response.status_code == 401:
