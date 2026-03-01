@@ -33,7 +33,7 @@ endif
 		printf "Create and push tag v$$NEW_VERSION? [y/N] "; \
 		read confirm; \
 		[ "$$confirm" = "y" ] || exit 1; \
-		git add src/core/__version__.py && \
+		git add src/__version__.py && \
 		git commit -m "Bump version to $$NEW_VERSION" && \
 		git tag -a "v$$NEW_VERSION" -m "Release v$$NEW_VERSION" && \
 		git push origin HEAD "v$$NEW_VERSION" && \

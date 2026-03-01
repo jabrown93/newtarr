@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # Prepare /config directory tree with correct ownership and permissions
 RUN mkdir -p /config/settings /config/stateful /config/user /config/logs && \
-    chown -R 1000:1000 /config && \
+    chown -R 65532:65532 /config && \
     chmod -R 700 /config
 
 # Final stage: minimal runtime image
