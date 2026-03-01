@@ -7,9 +7,10 @@ may be issues. A comprehensive security audit has been performed on the inherite
 review the findings in [SECURITY-AUDIT.md](SECURITY-AUDIT.md) and apply recommended mitigations, especially if running
 standalone without an SSO proxy.
 
-AI generated changes made in this fork will be reviewed by a professional software engineer, but users should still
-exercise caution and follow best practices when deploying. This fork is intended for my own usage and support is a best
-effort basis. I will do my best to address any issues that arise, but there are no guarantees.
+AI generated changes made in this fork will be reviewed by a professional software engineer, though my expertise is in backend systems
+and not frontend web apps. Ssers should still exercise caution and follow best practices when deploying. This fork is intended for my
+own usage and support is on a best effort basis. I will do my best to address any issues that arise, but there are no guarantees.
+Security issues will be prioritzed above all other issues.
 
 **DO NOT EXPOSE TO PUBLIC INTERNET**
 
