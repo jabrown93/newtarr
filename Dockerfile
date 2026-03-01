@@ -34,7 +34,7 @@ EXPOSE 9705
 
 # Health check using the existing /api/health endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:9705/api/health')" || exit 1
+    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:9705/ping')" || exit 1
 
 # Run the main application using the new entry point
 CMD ["python3", "main.py"]
