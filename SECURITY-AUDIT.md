@@ -1,11 +1,11 @@
 # Newtarr Security Audit
 
 **Audit Date:** 2026-02-24
-**Codebase:** Newtarr (fork of Newtarr v6.6.3)
+**Codebase:** Newtarr (fork of Huntarr v6.6.3)
 **Audited By:** Automated analysis (Claude)
 **Scope:** Full codebase — backend Python, frontend JavaScript/HTML, configuration, and deployment
 
-> **Context:** This audit was performed on the v6.6.3 codebase inherited from the upstream Newtarr project.
+> **Context:** This audit was performed on the v6.6.3 codebase inherited from the upstream Huntarr project.
 > These findings represent **pre-existing issues** in the original code. Newtarr is designed to run behind
 > an SSO proxy (e.g., Authelia, Authentik) in ElfHosted deployments, which mitigates many of the
 > authentication-related findings. Standalone users should review these findings carefully.

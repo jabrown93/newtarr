@@ -1,10 +1,10 @@
-# CLAUDE.md
+# AGENTS.md
 
 This file provides guidance to Agents when working with code in this repository.
 
 ## Project Overview
 
-Newtarr is a Python/Flask application that orchestrates media hunting across *arr applications (Sonarr, Radarr, Lidarr, Readarr, Whisparr, Eros, Swaparr). Fork of Newtarr v6.6.3, maintained by ElfHosted. It continuously searches media libraries for missing content and quality upgrades while rate-limiting indexer usage.
+Newtarr is a Python/Flask application that orchestrates media hunting across *arr applications (Sonarr, Radarr, Lidarr, Readarr, Whisparr, Eros, Swaparr). Fork of Huntarr v6.6.3, maintained by ElfHosted. It continuously searches media libraries for missing content and quality upgrades while rate-limiting indexer usage.
 
 ## Development Commands
 
@@ -16,7 +16,7 @@ docker compose up --build
 docker build -t newtarr .
 ```
 
-There is no test framework, linter, or Makefile configured. The app runs on port 9705.
+There is no test framework or linter configured. The app runs on port 9705.
 
 ## Architecture
 
