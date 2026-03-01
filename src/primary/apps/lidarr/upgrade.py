@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Lidarr cutoff upgrade processing module for NewtArr
+Lidarr cutoff upgrade processing module for Newtarr
 Handles albums that do not meet the configured quality cutoff.
 """
 

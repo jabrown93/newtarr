@@ -1,5 +1,5 @@
 /**
- * NewtArr - History Module
+ * Newtarr - History Module
  * Handles displaying and managing history entries for all media apps
  */
 

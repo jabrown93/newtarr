@@ -1,6 +1,6 @@
 """
-Windows Service module for NewtArr.
-Allows NewtArr to run as a Windows service.
+Windows Service module for Newtarr.
+Allows Newtarr to run as a Windows service.
 """
 
 import os
@@ -23,13 +23,13 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-logger = logging.getLogger('NewtArrWindowsService')
+logger = logging.getLogger('NewtarrWindowsService')
 
-class NewtArrService(win32serviceutil.ServiceFramework):
-    """Windows Service implementation for NewtArr"""
+class NewtarrService(win32serviceutil.ServiceFramework):
+    """Windows Service implementation for Newtarr"""
     
-    _svc_name_ = "NewtArr"
-    _svc_display_name_ = "NewtArr Service"
+    _svc_name_ = "Newtarr"
+    _svc_display_name_ = "Newtarr Service"
     _svc_description_ = "Automated media collection management for Arr apps"
     
     def __init__(self, args):
@@ -43,14 +43,14 @@ class NewtArrService(win32serviceutil.ServiceFramework):
         
     def SvcStop(self):
         """Stop the service"""
-        logger.info('Stopping NewtArr service...')
+        logger.info('Stopping Newtarr service...')
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
         win32event.SetEvent(self.stop_event)
         self.is_running = False
         
-        # Signal NewtArr to stop properly
+        # Signal Newtarr to stop properly
         if hasattr(self, 'stop_flag') and self.stop_flag:
-            logger.info('Setting stop flag for NewtArr...')
+            logger.info('Setting stop flag for Newtarr...')
             self.stop_flag.set()
         
     def SvcDoRun(self):
@@ -66,7 +66,7 @@ class NewtArrService(win32serviceutil.ServiceFramework):
     def main(self):
         """Main service loop"""
         try:
-            logger.info('Starting NewtArr service...')
+            logger.info('Starting Newtarr service...')
             
             # Import here to avoid import errors when installing the service
             import threading
@@ -85,7 +85,7 @@ class NewtArrService(win32serviceutil.ServiceFramework):
             # Start background tasks in a thread
             background_thread = threading.Thread(
                 target=start_newtarr, 
-                name="NewtArrBackground", 
+                name="NewtarrBackground", 
                 daemon=True
             )
             background_thread.start()
@@ -93,12 +93,12 @@ class NewtArrService(win32serviceutil.ServiceFramework):
             # Start the web server in a thread
             web_thread = threading.Thread(
                 target=lambda: serve(app, host='0.0.0.0', port=9705, threads=8),
-                name="NewtArrWebServer",
+                name="NewtarrWebServer",
                 daemon=True
             )
             web_thread.start()
             
-            logger.info('NewtArr service started successfully')
+            logger.info('Newtarr service started successfully')
             
             # Main service loop - keep running until stop event
             while self.is_running:
@@ -111,13 +111,13 @@ class NewtArrService(win32serviceutil.ServiceFramework):
                 
                 # Check if threads are still alive
                 if not background_thread.is_alive() or not web_thread.is_alive():
-                    logger.error("Critical: One of the NewtArr threads has died unexpectedly")
+                    logger.error("Critical: One of the Newtarr threads has died unexpectedly")
                     # Try to restart the threads if they died
                     if not background_thread.is_alive():
                         logger.info("Attempting to restart background thread...")
                         background_thread = threading.Thread(
                             target=start_newtarr, 
-                            name="NewtArrBackground", 
+                            name="NewtarrBackground", 
                             daemon=True
                         )
                         background_thread.start()
@@ -126,63 +126,63 @@ class NewtArrService(win32serviceutil.ServiceFramework):
                         logger.info("Attempting to restart web server thread...")
                         web_thread = threading.Thread(
                             target=lambda: serve(app, host='0.0.0.0', port=9705, threads=8),
-                            name="NewtArrWebServer",
+                            name="NewtarrWebServer",
                             daemon=True
                         )
                         web_thread.start()
             
             # Service is stopping, clean up
-            logger.info('NewtArr service is shutting down...')
+            logger.info('Newtarr service is shutting down...')
             
-            # Set the stop event for NewtArr's background tasks
+            # Set the stop event for Newtarr's background tasks
             if not stop_event.is_set():
                 stop_event.set()
             
             # Wait for threads to finish
-            logger.info('Waiting for NewtArr threads to finish...')
+            logger.info('Waiting for Newtarr threads to finish...')
             background_thread.join(timeout=30)
             web_thread.join(timeout=10)
             
-            logger.info('NewtArr service shutdown complete')
+            logger.info('Newtarr service shutdown complete')
             
         except Exception as e:
-            logger.exception(f"Critical error in NewtArr service: {e}")
-            servicemanager.LogErrorMsg(f"NewtArr service error: {str(e)}")
+            logger.exception(f"Critical error in Newtarr service: {e}")
+            servicemanager.LogErrorMsg(f"Newtarr service error: {str(e)}")
 
 
 def install_service():
-    """Install NewtArr as a Windows service"""
+    """Install Newtarr as a Windows service"""
     if sys.platform != 'win32':
         print("Windows service installation is only available on Windows.")
         return False
         
     try:
         win32serviceutil.InstallService(
-            pythonClassString="src.primary.windows_service.NewtArrService",
-            serviceName="NewtArr",
-            displayName="NewtArr Service",
+            pythonClassString="src.primary.windows_service.NewtarrService",
+            serviceName="Newtarr",
+            displayName="Newtarr Service",
             description="Automated media collection management for Arr apps",
             startType=win32service.SERVICE_AUTO_START
         )
-        print("NewtArr service installed successfully.")
+        print("Newtarr service installed successfully.")
         return True
     except Exception as e:
-        print(f"Error installing NewtArr service: {e}")
+        print(f"Error installing Newtarr service: {e}")
         return False
 
 
 def remove_service():
-    """Remove the NewtArr Windows service"""
+    """Remove the Newtarr Windows service"""
     if sys.platform != 'win32':
         print("Windows service removal is only available on Windows.")
         return False
         
     try:
-        win32serviceutil.RemoveService("NewtArr")
-        print("NewtArr service removed successfully.")
+        win32serviceutil.RemoveService("Newtarr")
+        print("Newtarr service removed successfully.")
         return True
     except Exception as e:
-        print(f"Error removing NewtArr service: {e}")
+        print(f"Error removing Newtarr service: {e}")
         return False
 
 
@@ -193,6 +193,6 @@ if __name__ == '__main__':
         elif sys.argv[1] == 'remove':
             remove_service()
         else:
-            win32serviceutil.HandleCommandLine(NewtArrService)
+            win32serviceutil.HandleCommandLine(NewtarrService)
     else:
-        win32serviceutil.HandleCommandLine(NewtArrService)
+        win32serviceutil.HandleCommandLine(NewtarrService)

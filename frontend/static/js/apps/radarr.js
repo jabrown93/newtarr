@@ -2,7 +2,7 @@
 
 (function(app) {
     if (!app) {
-        console.error("NewtArr App core is not loaded!");
+        console.error("Newtarr App core is not loaded!");
         return;
     }
 

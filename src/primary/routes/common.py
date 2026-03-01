@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Common routes blueprint for NewtArr web interface
+Common routes blueprint for Newtarr web interface
 """
 
 import os

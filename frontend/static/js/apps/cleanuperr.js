@@ -1,5 +1,5 @@
 /**
- * Cleanuperr - Information display component for NewtArr
+ * Cleanuperr - Information display component for Newtarr
  * Provides information about the Cleanuperr project by Flaminel
  */
 

@@ -119,7 +119,7 @@ def migrate_settings():
 
 if __name__ == "__main__":
     configure_logging()
-    logging.info("Starting NewtArr application")
+    logging.info("Starting Newtarr application")
     
     # Migrate settings to flat structure
     migrate_settings()

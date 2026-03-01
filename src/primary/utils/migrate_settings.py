@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Settings migration utility for NewtArr
+Settings migration utility for Newtarr
 Migrates settings from nested structure to flat structure
 """
 

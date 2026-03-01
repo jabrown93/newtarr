@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Main entry point for NewtArr
+Main entry point for Newtarr
 Starts both the web server and the background processing tasks.
 """
 
@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src'
 # Basic logging to capture early errors during import or setup
 log_level = logging.DEBUG if os.environ.get('DEBUG', 'false').lower() == 'true' else logging.INFO
 logging.basicConfig(level=log_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-root_logger = logging.getLogger("NewtArrRoot") # Specific logger for this entry point
-root_logger.info("--- NewtArr Main Process Starting ---")
+root_logger = logging.getLogger("NewtarrRoot") # Specific logger for this entry point
+root_logger.info("--- Newtarr Main Process Starting ---")
 root_logger.info(f"Python sys.path: {sys.path}")
 
 # Check for Windows service commands
@@ -49,7 +49,7 @@ if sys.platform == 'win32' and len(sys.argv) > 1:
     elif sys.argv[1] in ['--start', '--stop', '--restart', '--debug', '--update']:
         try:
             import win32serviceutil
-            service_name = "NewtArr"
+            service_name = "Newtarr"
             if sys.argv[1] == '--start':
                 win32serviceutil.StartService(service_name)
                 print(f"Started {service_name} service")
@@ -61,8 +61,8 @@ if sys.platform == 'win32' and len(sys.argv) > 1:
                 print(f"Restarted {service_name} service")
             elif sys.argv[1] == '--debug':
                 # Run the service in debug mode directly
-                from src.primary.windows_service import NewtArrService
-                win32serviceutil.HandleCommandLine(NewtArrService)
+                from src.primary.windows_service import NewtarrService
+                win32serviceutil.HandleCommandLine(NewtarrService)
             elif sys.argv[1] == '--update':
                 # Update the service
                 win32serviceutil.StopService(service_name)
@@ -103,15 +103,15 @@ except Exception as e:
 _waitress_server = None  # Handle to Waitress server for graceful shutdown
 
 def run_background_tasks():
-    """Runs the NewtArr background processing."""
-    bg_logger = get_logger("NewtArrBackground") # Use app's logger
+    """Runs the Newtarr background processing."""
+    bg_logger = get_logger("NewtarrBackground") # Use app's logger
     try:
-        bg_logger.info("Starting NewtArr background tasks...")
+        bg_logger.info("Starting Newtarr background tasks...")
         start_newtarr() # This function contains the main loop and shutdown logic
     except Exception as e:
-        bg_logger.exception(f"Critical error in NewtArr background tasks: {e}")
+        bg_logger.exception(f"Critical error in Newtarr background tasks: {e}")
     finally:
-        bg_logger.info("NewtArr background tasks stopped.")
+        bg_logger.info("Newtarr background tasks stopped.")
 
 def run_web_server():
     """Runs the Flask web server using Waitress in production."""
@@ -176,7 +176,7 @@ if __name__ == '__main__':
         # Start background tasks in a daemon thread
         # Daemon threads exit automatically if the main thread exits unexpectedly,
         # but we'll try to join() them for a graceful shutdown.
-        background_thread = threading.Thread(target=run_background_tasks, name="NewtArrBackground", daemon=True)
+        background_thread = threading.Thread(target=run_background_tasks, name="NewtarrBackground", daemon=True)
         background_thread.start()
 
         # Start the web server in the main thread (blocking)
@@ -217,6 +217,6 @@ if __name__ == '__main__':
         # newtarr_logger.info("Calling shutdown_threads()...")
         # shutdown_threads() # Uncomment if primary.main.shutdown_threads() does more cleanup
 
-        newtarr_logger.info("--- NewtArr Main Process Exiting ---")
+        newtarr_logger.info("--- Newtarr Main Process Exiting ---")
         # Use os._exit(0) for a more forceful exit if necessary, but sys.exit(0) is generally preferred
         sys.exit(0)

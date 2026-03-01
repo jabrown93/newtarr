@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Stateful Manager for NewtArr
+Stateful Manager for Newtarr
 Handles storing and retrieving processed media IDs to prevent reprocessing
 """
 

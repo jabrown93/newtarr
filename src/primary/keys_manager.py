@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Keys manager for NewtArr
+Keys manager for Newtarr
 Handles storage and retrieval of API keys and URLs from newtarr.json
 """
 

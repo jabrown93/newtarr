@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Scheduler Engine for NewtArr
+Scheduler Engine for Newtarr
 Handles execution of scheduled actions from schedule.json
 """
 

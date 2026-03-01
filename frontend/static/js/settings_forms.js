@@ -1,5 +1,5 @@
 /**
- * Settings forms for NewtArr
+ * Settings forms for Newtarr
  * This file handles generating HTML forms for each app's settings
  */
 
@@ -842,7 +842,7 @@ const SettingsForms = {
             <div class="settings-group">
                 <h3>Swaparr (Beta) - Only For Torrent Users</h3>
                 <div class="setting-item">
-                    <p>Swaparr addresses the issue of stalled downloads and I rewrote it to support NewtArr. Visit Swaparr's <a href="https://github.com/ThijmenGThN/swaparr" target="_blank">GitHub</a> for more information and support the developer!</p>
+                    <p>Swaparr addresses the issue of stalled downloads and I rewrote it to support Newtarr. Visit Swaparr's <a href="https://github.com/ThijmenGThN/swaparr" target="_blank">GitHub</a> for more information and support the developer!</p>
                 </div>
             </div>
 
@@ -935,7 +935,7 @@ const SettingsForms = {
             })
             .catch(error => {
                 console.error('Error loading Swaparr status:', error);
-                statusContainer.innerHTML = `<p>Error fetching status: ${NewtArrUtils.escapeHtml(error.message)}</p>`;
+                statusContainer.innerHTML = `<p>Error fetching status: ${NewtarrUtils.escapeHtml(error.message)}</p>`;
             });
 
         // Add event listener for the Reset Strikes button
@@ -954,7 +954,7 @@ const SettingsForms = {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            statusContainer.innerHTML = `<p>Success: ${NewtArrUtils.escapeHtml(data.message)}</p>`;
+                            statusContainer.innerHTML = `<p>Success: ${NewtarrUtils.escapeHtml(data.message)}</p>`;
                             // Reload status after a short delay
                             setTimeout(() => {
                                 fetch('/api/swaparr/status')
@@ -964,7 +964,7 @@ const SettingsForms = {
                                         if (data.statistics && Object.keys(data.statistics).length > 0) {
                                             statusHTML += '<ul>';
                                             for (const [app, stats] of Object.entries(data.statistics)) {
-                                                const esc = NewtArrUtils.escapeHtml;
+                                                const esc = NewtarrUtils.escapeHtml;
                                                 statusHTML += `<li><strong>${esc(app.toUpperCase())}</strong>: `;
                                                 if (stats.error) {
                                                     statusHTML += `Error: ${esc(stats.error)}</li>`;
@@ -980,11 +980,11 @@ const SettingsForms = {
                                     });
                             }, 1000);
                         } else {
-                            statusContainer.innerHTML = `<p>Error: ${NewtArrUtils.escapeHtml(data.message)}</p>`;
+                            statusContainer.innerHTML = `<p>Error: ${NewtarrUtils.escapeHtml(data.message)}</p>`;
                         }
                     })
                     .catch(error => {
-                        statusContainer.innerHTML = `<p>Error resetting strikes: ${NewtArrUtils.escapeHtml(error.message)}</p>`;
+                        statusContainer.innerHTML = `<p>Error resetting strikes: ${NewtarrUtils.escapeHtml(error.message)}</p>`;
                     });
                 }
             });
@@ -1220,7 +1220,7 @@ const SettingsForms = {
                         <input type="checkbox" id="check_for_updates" ${settings.check_for_updates !== false ? 'checked' : ''}>
                         <span class="toggle-slider" style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#3d4353; border-radius:20px; transition:0.4s;"></span>
                     </label>
-                    <p class="setting-help" style="margin-left: -3ch !important;">Automatically check for NewtArr updates</p>
+                    <p class="setting-help" style="margin-left: -3ch !important;">Automatically check for Newtarr updates</p>
                 </div>
                 <div class="setting-item">
                     <label for="debug_mode"><span class="info-icon" title="Enable verbose logging for troubleshooting"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Debug Mode:</label>
@@ -1320,7 +1320,7 @@ const SettingsForms = {
                 <div class="setting-item">
                     <label for="log_refresh_interval_seconds"><span class="info-icon" title="Seconds between log display refreshes in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Log Refresh Interval:</label>
                     <input type="number" id="log_refresh_interval_seconds" min="5" value="${settings.log_refresh_interval_seconds !== undefined ? settings.log_refresh_interval_seconds : 30}">
-                    <p class="setting-help" style="margin-left: -3ch !important;">How often NewtArr refreshes logs from apps (seconds)</p>
+                    <p class="setting-help" style="margin-left: -3ch !important;">How often Newtarr refreshes logs from apps (seconds)</p>
                 </div>
             </div>
         `;

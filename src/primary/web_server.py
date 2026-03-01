@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Web server for NewtArr
+Web server for Newtarr
 Provides a web interface to view logs in real-time, manage settings, and includes authentication
 """
 

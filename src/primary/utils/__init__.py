@@ -1,5 +1,5 @@
 """
-Utility functions for NewtArr
+Utility functions for Newtarr
 """
 
 from src.primary.utils.logger import logger, debug_log

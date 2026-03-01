@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scheduling - NewtArr Documentation</title>
+    <title>Scheduling - Newtarr Documentation</title>
     <link rel="stylesheet" href="../css/main.css">
     <script src="../js/main.js" defer></script>
 </head>
 <body>
     <div class="sidebar">
         <div class="sidebar-logo">
-            <img src="../images/newtarr-logo.png" alt="NewtArr Logo">
-            <h2>NewtArr</h2>
+            <img src="../images/newtarr-logo.png" alt="Newtarr Logo">
+            <h2>Newtarr</h2>
         </div>
-        
+
         <nav class="sidebar-nav">
             <div class="sidebar-section">
                 <h3 class="sidebar-section-title">Core</h3>
@@ -23,7 +23,7 @@
                     <li><a href="../settings/index.html"><svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path></svg> Settings</a></li>
                 </ul>
             </div>
-            
+
             <div class="sidebar-section">
                 <h3 class="sidebar-section-title">Features</h3>
                 <ul>
@@ -32,7 +32,7 @@
                     <li><a href="history.html"><svg class="svg-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"></path></svg> History</a></li>
                 </ul>
             </div>
-            
+
             <div class="sidebar-section">
                 <h3 class="sidebar-section-title">Resources</h3>
                 <ul>
@@ -42,20 +42,20 @@
             </div>
         </nav>
     </div>
-    
+
     <div class="main-content">
         <div class="container">
-            <h1>Scheduling in NewtArr</h1>
-            
+            <h1>Scheduling in Newtarr</h1>
+
             <div class="content-block">
                 <h2>Overview</h2>
                 <p>
-                    NewtArr's scheduling system allows you to automate routine tasks for your media management applications on a recurring schedule.
+                    Newtarr's scheduling system allows you to automate routine tasks for your media management applications on a recurring schedule.
                     Instead of manually triggering actions like searching for missing media or upgrading content quality, you can set up automated schedules
                     to handle these tasks at specific times and days.
                 </p>
             </div>
-            
+
             <div class="content-block">
                 <h2>Key Features</h2>
                 <ul class="feature-list">
@@ -66,14 +66,14 @@
                     <li><strong>Execution History</strong> - Track when scheduled actions were last executed and their status</li>
                 </ul>
             </div>
-            
+
             <div class="content-block">
                 <h2>How Scheduling Works</h2>
                 <p>
-                    NewtArr's scheduling system runs in the background, checking every minute to see if any scheduled actions need to be executed.
+                    Newtarr's scheduling system runs in the background, checking every minute to see if any scheduled actions need to be executed.
                     When you configure a schedule, you specify:
                 </p>
-                
+
                 <ul>
                     <li><strong>App Type</strong> - Which app this schedule applies to (global, Sonarr, Radarr, etc.)</li>
                     <li><strong>Action</strong> - What action to perform (search missing, upgrade quality, etc.)</li>
@@ -81,19 +81,19 @@
                     <li><strong>Days</strong> - Which days of the week to run the action</li>
                     <li><strong>App Instance</strong> - For multi-instance setups, which instance to target</li>
                 </ul>
-                
+
                 <p>
-                    The scheduling engine validates the timing against the current system time and executes the appropriate action 
+                    The scheduling engine validates the timing against the current system time and executes the appropriate action
                     when a schedule's criteria are met. All execution results are logged for monitoring.
                 </p>
             </div>
-            
+
             <div class="content-block">
                 <h2>Creating a Schedule</h2>
                 <ol class="step-list">
                     <li>
                         <strong>Navigate to the Scheduling Page</strong>
-                        <p>From the NewtArr dashboard, click on the "Scheduling" option in the sidebar navigation.</p>
+                        <p>From the Newtarr dashboard, click on the "Scheduling" option in the sidebar navigation.</p>
                     </li>
                     <li>
                         <strong>Click "Add Schedule"</strong>
@@ -113,17 +113,17 @@
                     </li>
                     <li>
                         <strong>Save Your Schedule</strong>
-                        <p>Click "Save" to create the schedule. It will be stored in NewtArr's persistent storage.</p>
+                        <p>Click "Save" to create the schedule. It will be stored in Newtarr's persistent storage.</p>
                     </li>
                 </ol>
             </div>
-            
+
             <div class="content-block">
                 <h2>Schedule Data Structure</h2>
                 <p>
-                    NewtArr stores schedule information in a JSON format. Each schedule includes:
+                    Newtarr stores schedule information in a JSON format. Each schedule includes:
                 </p>
-                
+
                 <pre><code>{
   "id": "unique-schedule-id",
   "action": "search_missing",
@@ -133,9 +133,9 @@
   "enabled": true,
   "appType": "sonarr"
 }</code></pre>
-                
+
                 <p>These schedules are organized by app type in the storage system:</p>
-                
+
                 <pre><code>{
   "global": [ /* global schedules */ ],
   "sonarr": [ /* sonarr-specific schedules */ ],
@@ -146,11 +146,11 @@
   "eros": [ /* eros-specific schedules */ ]
 }</code></pre>
             </div>
-            
+
             <div class="content-block">
                 <h2>Available Actions</h2>
                 <p>Depending on the app type, different actions are available for scheduling:</p>
-                
+
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -203,12 +203,12 @@
                         <tr>
                             <td>Global</td>
                             <td>refresh_cache</td>
-                            <td>Refresh NewtArr's internal cache</td>
+                            <td>Refresh Newtarr's internal cache</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="content-block">
                 <h2>Managing Schedules</h2>
                 <h3>Editing a Schedule</h3>
@@ -216,20 +216,20 @@
                     To edit an existing schedule, click the edit icon (pencil) next to the schedule in the list.
                     This will open the schedule editor where you can modify any of the settings.
                 </p>
-                
+
                 <h3>Enabling/Disabling Schedules</h3>
                 <p>
                     You can quickly enable or disable a schedule by toggling the switch in the "Enabled" column.
                     Disabled schedules remain in the system but won't be executed until enabled again.
                 </p>
-                
+
                 <h3>Deleting a Schedule</h3>
                 <p>
                     To remove a schedule completely, click the delete icon (trash) next to the schedule.
                     You'll be asked to confirm before the schedule is permanently removed.
                 </p>
             </div>
-            
+
             <div class="content-block">
                 <h2>Viewing Schedule History</h2>
                 <p>
@@ -247,7 +247,7 @@
                     <li>Any error messages if applicable</li>
                 </ul>
             </div>
-            
+
             <div class="content-block">
                 <h2>Best Practices</h2>
                 <ul>
@@ -257,7 +257,7 @@
                     <li><strong>Start Small</strong> - Begin with a few essential schedules before adding more complex automation</li>
                 </ul>
             </div>
-            
+
             <div class="content-block">
                 <h2>Troubleshooting</h2>
                 <h3>Schedule Not Running</h3>
@@ -267,10 +267,10 @@
                     <li>Ensure the target app is properly configured and connected</li>
                     <li>Check the logs for any error messages</li>
                 </ul>
-                
+
                 <h3>Schedule Running But Not Working</h3>
                 <ul>
-                    <li>Verify the app API is accessible from NewtArr</li>
+                    <li>Verify the app API is accessible from Newtarr</li>
                     <li>Check if the action can be performed manually</li>
                     <li>Look for error messages in the schedule history</li>
                     <li>Ensure the app instance selected is correct</li>

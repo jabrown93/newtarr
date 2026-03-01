@@ -3,7 +3,7 @@
     <div class="top-color-line"></div>
     <div class="topbar-section left">
         <div class="page-title" id="currentPageTitle"></div>
-        <span class="topbar-tagline">a neutered fork of NewtArr v6.6.3, from simpler times, maintained by <a href="https://store.elfhosted.com" target="_blank" rel="noopener">ElfHosted</a></span>
+        <span class="topbar-tagline">a neutered fork of Newtarr v6.6.3, from simpler times, maintained by <a href="https://store.elfhosted.com" target="_blank" rel="noopener">ElfHosted</a></span>
     </div>
     <div class="topbar-section center">
         <div class="version-bar">
@@ -37,7 +37,7 @@
         transition: all 0.3s ease;
         backdrop-filter: blur(5px); /* Add subtle blur effect for depth */
     }
-    
+
     /* Top color line */
     .top-color-line {
         position: absolute;
@@ -61,17 +61,17 @@
         background: linear-gradient(90deg, rgba(80, 118, 46, 0.6), rgba(141, 158, 64, 0.6));
         z-index: 1;
     }
-    
+
     .topbar-section {
         display: flex;
         align-items: center;
     }
-    
+
     .topbar-section.left {
         flex: 1;
         justify-content: flex-start;
     }
-    
+
     .topbar-section.center {
         flex: 1;
         justify-content: center;
@@ -82,12 +82,12 @@
         transform: unset;
         width: auto;
     }
-    
+
     .topbar-section.right {
         flex: 1;
         justify-content: flex-end;
     }
-    
+
     /* Page title styling */
     .page-title {
         font-size: 16px;
@@ -112,7 +112,7 @@
         color: #a8b84d;
         text-decoration: underline;
     }
-    
+
     .version-bar {
         display: flex;
         align-items: center;
@@ -124,7 +124,7 @@
         box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
         border: 1px solid rgba(90, 109, 137, 0.15);
     }
-    
+
     .version-item {
         display: flex;
         align-items: center;
@@ -133,33 +133,33 @@
         color: #e0e6ed;
         transition: all 0.2s ease;
     }
-    
+
     .version-item:hover {
         transform: translateY(-1px);
     }
-    
+
     .version-divider {
         width: 1px;
         height: 14px;
         background-color: rgba(120, 140, 180, 0.3);
     }
-    
+
     .version-icon {
         color: #8D9E40;
         font-size: 13px;
         filter: drop-shadow(0 0 2px rgba(80, 118, 46, 0.4));
     }
-    
+
     .star-icon {
         color: #ffd700;
         animation: star-pulse 3s infinite alternate;
     }
-    
+
     @keyframes star-pulse {
         0% { filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.4)); }
         100% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8)); }
     }
-    
+
     .version-bar a {
         color: #8D9E40;
         text-decoration: none;
@@ -182,20 +182,20 @@
     .version-bar a:hover {
         color: #a8b84d;
     }
-    
+
     .version-bar a:hover::after {
         width: 100%;
     }
-    
+
     .developer-credit {
         color: #e0e6ed;
     }
-    
+
     .developer-credit a {
         color: #8D9E40;
         font-weight: 600;
     }
-    
+
     /* User info styling */
     .user-info {
         display: flex;
@@ -208,29 +208,29 @@
         border: 1px solid rgba(90, 109, 137, 0.15);
         transition: all 0.2s ease;
     }
-    
+
     .user-info:hover {
         background: rgba(25, 35, 50, 0.6);
     }
-    
+
     #username {
         font-weight: 600;
         color: #e0e6ed;
         font-size: 13px;
     }
-    
+
     .logout-btn {
         color: #e74c3c;
         transition: all 0.2s ease;
         opacity: 0.8;
     }
-    
+
     .logout-btn:hover {
         color: #ff6b6b;
         opacity: 1;
         transform: scale(1.1);
     }
-    
+
     /* Responsive styling */
     @media (max-width: 768px) {
         .top-bar {
@@ -239,18 +239,18 @@
             align-items: center;
             padding: 0 10px;
         }
-        
+
         /* Ensure color line spans full width on mobile */
         .top-color-line {
             width: 100%;
         }
-        
+
         .topbar-section.left,
         .topbar-section.center {
             display: inline-flex;
             align-items: center;
         }
-        
+
         .topbar-section.left {
             margin-right: 10px;
         }
@@ -267,17 +267,17 @@
         .topbar-section.right {
             display: none; /* Hide user info on mobile to save space */
         }
-        
+
         .version-bar {
             display: flex !important;
             gap: 8px !important;
             flex-wrap: nowrap;
         }
-        
+
         .version-item {
             display: none !important;
         }
-        
+
         .version-item:nth-child(1),
         .version-item:nth-child(3) {
             display: flex !important;
@@ -288,17 +288,17 @@
             margin: 0;
             border: 1px solid rgba(90, 109, 137, 0.2);
         }
-        
+
         .version-divider {
             display: none !important;
         }
-        
+
         .version-divider:nth-child(2) {
             display: block !important;
             height: 12px;
             margin: 0 5px;
         }
-        
+
         /* Sidebar related styles, preserved */
         .sidebar {
             display: flex !important;
@@ -307,13 +307,13 @@
             align-items: center !important;
             height: 100vh !important;
         }
-        
+
         .nav-menu {
             flex-direction: column !important;
             align-items: center !important;
             width: 100%;
         }
-        
+
         .nav-item {
             display: flex !important;
             justify-content: center !important;
@@ -322,7 +322,7 @@
             margin: 0 auto 8px auto !important;
             padding: 0 !important;
         }
-        
+
         .nav-icon-wrapper {
             margin: 0 !important;
             width: 32px !important;
@@ -332,7 +332,7 @@
             align-items: center !important;
         }
     }
-    
+
     /* Phone-specific styling for very small screens */
     @media (max-width: 480px) {
         .top-bar {
@@ -341,24 +341,24 @@
             justify-content: center;
             padding: 5px 10px;
         }
-        
+
         .topbar-section.left {
             margin: 0 0 5px 0;
             justify-content: center;
             width: 100%;
         }
-        
+
         .topbar-section.center {
             justify-content: center;
             width: 100%;
         }
-        
+
         .version-bar {
             justify-content: center;
             flex-wrap: wrap !important;
             gap: 5px !important;
         }
-        
+
         /* Make the page title centered */
         .page-title {
             width: 100%;

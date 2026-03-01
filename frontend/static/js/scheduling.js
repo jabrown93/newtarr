@@ -1,5 +1,5 @@
 /**
- * Scheduling functionality for NewtArr
+ * Scheduling functionality for Newtarr
  * Implements a SABnzbd-style scheduler for controlling Arr application behavior
  */
 
@@ -681,7 +681,7 @@ function renderSchedules() {
         }
         
         // Build the schedule item HTML (checkbox removed but layout preserved)
-        const esc = NewtArrUtils.escapeHtml;
+        const esc = NewtarrUtils.escapeHtml;
         scheduleItem.innerHTML = `
             <div class="schedule-item-checkbox"></div>
             <div class="schedule-item-time">${esc(formattedTime)}</div>

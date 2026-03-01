@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Statistics Manager for NewtArr
+Statistics Manager for Newtarr
 Handles tracking, storing, and retrieving statistics about hunted and upgraded media
 and monitoring hourly API usage for rate limiting
 """

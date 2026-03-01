@@ -1,5 +1,5 @@
 """
-Eros app module for NewtArr
+Eros app module for Newtarr
 Contains functionality for missing items and quality upgrades in Eros
 
 Exclusively supports the v3 API.

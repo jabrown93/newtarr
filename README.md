@@ -1,4 +1,4 @@
-# NewtArr
+# Newtarr
 
 ## Warning
 
@@ -15,22 +15,22 @@ effort basis. I will do my best to address any issues that arise, but there are 
 
 # Original README from ElfHosted fork follow below
 
-A neutered fork of [NewtArr](https://github.com/plexguide/NewtArr.io) v6.6.3, from simpler times, maintained
+A neutered fork of [Newtarr](https://github.com/plexguide/Newtarr.io) v6.6.3, from simpler times, maintained
 by [ElfHosted](https://store.elfhosted.com).
 
 ## Why this fork?
 
-The original NewtArr project was abandoned under controversial circumstances. The developer introduced telemetry,
+The original Newtarr project was abandoned under controversial circumstances. The developer introduced telemetry,
 obfuscated code, and potential security concerns that led to significant community backlash. For context,
 see [this Reddit thread](https://www.reddit.com/r/selfhosted/comments/1rckopd/newtarr_your_passwords_and_your_entire_arr_stacks/?share_id=uq4GWZe3e0FNKUIXWHiq8).
 
-NewtArr is based on v6.6.3, the last clean release before the controversial changes. It has been customized for use
+Newtarr is based on v6.6.3, the last clean release before the controversial changes. It has been customized for use
 within [ElfHosted](https://store.elfhosted.com), but can be used standalone.
 
 Read the full
-announcement: [NewtArr Ends Its Hunt, NewtArr Takes It Up](https://store.elfhosted.com/blog/2026/02/24/newtarr-ends-its-hunt-newtarr-takes-it-up/)
+announcement: [Newtarr Ends Its Hunt, Newtarr Takes It Up](https://store.elfhosted.com/blog/2026/02/24/newtarr-ends-its-hunt-newtarr-takes-it-up/)
 
-## NewtArr Feature Timeline
+## Newtarr Feature Timeline
 
 Understanding why we forked at v6.6.3:
 
@@ -81,9 +81,9 @@ If you want just the "hunt missing episodes/movies" functionality, the sweet spo
 Avoid 7.x+ — that's where the request system, Plex auth, Prowlarr, and the massive DB layer arrived. And 9.x is a
 completely different application with built-in download clients.
 
-## Changes from upstream NewtArr v6.6.3
+## Changes from upstream Newtarr v6.6.3
 
-- Rebranded to "NewtArr"
+- Rebranded to "Newtarr"
 - ElfHosted green color scheme
 - Authentication disabled by default (designed for SSO-proxied deployments)
 - Graceful Docker shutdown (no more hanging on SIGTERM)
@@ -94,7 +94,7 @@ completely different application with built-in download clients.
 
 ## What it does
 
-NewtArr continuously searches your *arr media libraries (Sonarr, Radarr, Lidarr, Readarr, Whisparr) for missing content
+Newtarr continuously searches your *arr media libraries (Sonarr, Radarr, Lidarr, Readarr, Whisparr) for missing content
 and items that need quality upgrades. It automatically triggers searches while being gentle on your indexers, helping
 you gradually complete your media collection.
 
@@ -148,4 +148,4 @@ codebase.
 
 ## License
 
-This project is a fork of NewtArr.io. See [LICENSE](LICENSE) for details.
+This project is a fork of Newtarr.io. See [LICENSE](LICENSE) for details.

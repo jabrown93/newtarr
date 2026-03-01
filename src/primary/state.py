@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-State management module for NewtArr
+State management module for Newtarr
 Handles all persistence of program state
 """
 

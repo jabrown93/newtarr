@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sonarr cutoff upgrade processing module for NewtArr
+Sonarr cutoff upgrade processing module for Newtarr
 """
 
 import time

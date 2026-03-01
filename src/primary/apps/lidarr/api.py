@@ -49,11 +49,11 @@ def arr_request(api_url: str, api_key: str, api_timeout: int, endpoint: str, met
     # Make sure URL is properly formed
     full_url = f"{api_url.rstrip('/')}/api/v1/{endpoint.lstrip('/')}"
         
-    # Set up headers with User-Agent to identify NewtArr
+    # Set up headers with User-Agent to identify Newtarr
     headers = {
         "X-Api-Key": api_key,
         "Content-Type": "application/json",
-        "User-Agent": "NewtArr/1.0 (https://github.com/jabrown93/newtarr)"
+        "User-Agent": "Newtarr/1.0 (https://github.com/jabrown93/newtarr)"
     }
     
     lidarr_logger.debug(f"Using User-Agent: {headers['User-Agent']}")

@@ -1,8 +1,8 @@
-# Copilot Instructions for NewtArr
+# Copilot Instructions for Newtarr
 
 ## Project Overview
 
-NewtArr is a Python/Flask application that orchestrates media hunting across *arr applications (Sonarr, Radarr, Lidarr, Readarr, Whisparr, Eros, Swaparr). It is a fork of NewtArr v6.6.3, maintained by ElfHosted. The app continuously searches media libraries for missing content and quality upgrades while rate-limiting indexer usage.
+Newtarr is a Python/Flask application that orchestrates media hunting across *arr applications (Sonarr, Radarr, Lidarr, Readarr, Whisparr, Eros, Swaparr). It is a fork of Newtarr v6.6.3, maintained by ElfHosted. The app continuously searches media libraries for missing content and quality upgrades while rate-limiting indexer usage.
 
 ## Build & Run
 

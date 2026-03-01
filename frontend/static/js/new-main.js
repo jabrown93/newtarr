@@ -1,5 +1,5 @@
 /**
- * NewtArr - New UI Implementation
+ * Newtarr - New UI Implementation
  * Main JavaScript file for handling UI interactions and API communication
  */
 
@@ -890,7 +890,7 @@ let newtarrUI = {
                     if (match) {
                         const [, appName, timestamp, loggerName, level, message] = match;
                         
-                        const esc = NewtArrUtils.escapeHtml;
+                        const esc = NewtarrUtils.escapeHtml;
                         logEntry.innerHTML = `
                             <span class="log-timestamp" title="${esc(timestamp)}">${esc(timestamp.split(' ')[1])}</span>
                             ${appName ? `<span class="log-app" title="Source: ${esc(appName)}">[${esc(appName)}]</span>` : ''}
@@ -901,7 +901,7 @@ let newtarrUI = {
                         logEntry.classList.add(`log-${level.toLowerCase()}`);
                     } else {
                         // Fallback for lines that don't match the expected format
-                        logEntry.innerHTML = `<span class="log-message">${NewtArrUtils.escapeHtml(logString)}</span>`;
+                        logEntry.innerHTML = `<span class="log-message">${NewtarrUtils.escapeHtml(logString)}</span>`;
                         
                         // Basic level detection for fallback
                         if (logString.includes('ERROR')) logEntry.classList.add('log-error');
@@ -1140,7 +1140,7 @@ let newtarrUI = {
         this.settingsChanged = false;
         
         // Get all settings to populate forms
-        NewtArrUtils.fetchWithTimeout('/api/settings')
+        NewtarrUtils.fetchWithTimeout('/api/settings')
             .then(response => response.json())
             .then(data => {
                 console.log('Loaded settings:', data);
@@ -1250,7 +1250,7 @@ let newtarrUI = {
         // Use the correct endpoint based on app type
         const endpoint = app === 'general' ? '/api/settings/general' : `/api/settings/${app}`;
         
-        NewtArrUtils.fetchWithTimeout(endpoint, {
+        NewtarrUtils.fetchWithTimeout(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1634,7 +1634,7 @@ let newtarrUI = {
         url = this.cleanUrlString(url);
         
         // Make the API request to test the connection
-        NewtArrUtils.fetchWithTimeout(`/api/${appName}/test-connection`, {
+        NewtarrUtils.fetchWithTimeout(`/api/${appName}/test-connection`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1729,7 +1729,7 @@ let newtarrUI = {
     },
     
     checkAppConnection: function(app) {
-        NewtArrUtils.fetchWithTimeout(`/api/status/${app}`)
+        NewtarrUtils.fetchWithTimeout(`/api/status/${app}`)
             .then(response => response.json())
             .then(data => {
                 // Pass the whole data object for all apps
@@ -1807,7 +1807,7 @@ let newtarrUI = {
     
     // User actions
     startHunt: function() {
-        NewtArrUtils.fetchWithTimeout('/api/hunt/start', { method: 'POST' })
+        NewtarrUtils.fetchWithTimeout('/api/hunt/start', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1823,7 +1823,7 @@ let newtarrUI = {
     },
     
     stopHunt: function() {
-        NewtArrUtils.fetchWithTimeout('/api/hunt/stop', { method: 'POST' })
+        NewtarrUtils.fetchWithTimeout('/api/hunt/stop', { method: 'POST' })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
@@ -1843,7 +1843,7 @@ let newtarrUI = {
         const usernameElement = document.getElementById('username');
         if (!usernameElement) return;
         
-        NewtArrUtils.fetchWithTimeout('/api/user/info')
+        NewtarrUtils.fetchWithTimeout('/api/user/info')
             .then(response => response.json())
             .then(data => {
                 if (data.username) {
@@ -1864,7 +1864,7 @@ let newtarrUI = {
     // Check if local access bypass is enabled and update UI accordingly
     checkLocalAccessBypassStatus: function() {
         console.log("Checking local access bypass status...");
-        NewtArrUtils.fetchWithTimeout('/api/get_local_access_bypass_status') // Corrected URL
+        NewtarrUtils.fetchWithTimeout('/api/get_local_access_bypass_status') // Corrected URL
             .then(response => {
                 if (!response.ok) {
                     // Log error if response is not OK (e.g., 404, 500)
@@ -1949,7 +1949,7 @@ let newtarrUI = {
     logout: function(e) { // Added logout function
         e.preventDefault(); // Prevent default link behavior
         console.log('[newtarrUI] Logging out...');
-        NewtArrUtils.fetchWithTimeout('/logout', { // Use the correct endpoint defined in Flask
+        NewtarrUtils.fetchWithTimeout('/logout', { // Use the correct endpoint defined in Flask
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1973,7 +1973,7 @@ let newtarrUI = {
     
     // Media statistics handling
     loadMediaStats: function() {
-        NewtArrUtils.fetchWithTimeout('/api/stats')
+        NewtarrUtils.fetchWithTimeout('/api/stats')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -2064,7 +2064,7 @@ let newtarrUI = {
         try {
             const requestBody = appType ? { app_type: appType } : {};
             
-            NewtArrUtils.fetchWithTimeout('/api/stats/reset', {
+            NewtarrUtils.fetchWithTimeout('/api/stats/reset', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2128,7 +2128,7 @@ let newtarrUI = {
 
     // Load current version from version.txt
     loadCurrentVersion: function() {
-        NewtArrUtils.fetchWithTimeout('/version.txt')
+        NewtarrUtils.fetchWithTimeout('/version.txt')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to load version.txt');
@@ -2153,7 +2153,7 @@ let newtarrUI = {
     // Load latest version from GitHub releases (disabled - upstream repo removed)
     loadLatestVersion: function() {
         return;
-        NewtArrUtils.fetchWithTimeout('https://api.github.com/repos/plexguide/NewtArr.io/releases/latest')
+        NewtarrUtils.fetchWithTimeout('https://api.github.com/repos/plexguide/Newtarr.io/releases/latest')
             .then(response => {
                 if (!response.ok) {
                     // Handle rate limiting or other errors
@@ -2186,7 +2186,7 @@ let newtarrUI = {
     // Load latest beta version from GitHub tags (disabled - upstream repo removed)
     loadBetaVersion: function() {
         return;
-        NewtArrUtils.fetchWithTimeout('https://api.github.com/repos/plexguide/NewtArr.io/tags?per_page=100')
+        NewtarrUtils.fetchWithTimeout('https://api.github.com/repos/plexguide/Newtarr.io/tags?per_page=100')
             .then(response => {
                 if (!response.ok) {
                     // Handle rate limiting or other errors
@@ -2243,7 +2243,7 @@ let newtarrUI = {
         // GitHub API endpoint for repository information
         const apiUrl = 'https://api.github.com/repos/jabrown93/newtarr';
         
-        NewtArrUtils.fetchWithTimeout(apiUrl)
+        NewtarrUtils.fetchWithTimeout(apiUrl)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`GitHub API error: ${response.status}`);
@@ -2362,7 +2362,7 @@ let newtarrUI = {
         }
         
         // Always fetch fresh data from the server
-        NewtArrUtils.fetchWithTimeout('/api/stateful/info', { 
+        NewtarrUtils.fetchWithTimeout('/api/stateful/info', { 
             cache: 'no-cache',
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -2556,7 +2556,7 @@ let newtarrUI = {
         // Add debug logging
         console.log("Sending reset request to /api/stateful/reset");
         
-        NewtArrUtils.fetchWithTimeout('/api/stateful/reset', {
+        NewtarrUtils.fetchWithTimeout('/api/stateful/reset', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -2622,7 +2622,7 @@ let newtarrUI = {
         const url = '/api/stateful/update-expiration';
         const cleanedUrl = this.cleanUrlString(url);
         
-        NewtArrUtils.fetchWithTimeout(cleanedUrl, {
+        NewtarrUtils.fetchWithTimeout(cleanedUrl, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -2673,7 +2673,7 @@ let newtarrUI = {
         console.log(`[newtarrUI] Directly updating stateful expiration to ${hours} hours`);
         
         // Make a direct API call to update the stateful expiration
-        NewtArrUtils.fetchWithTimeout('/api/stateful/update-expiration', {
+        NewtarrUtils.fetchWithTimeout('/api/stateful/update-expiration', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

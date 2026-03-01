@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NewtArr - Main entry point for the application
+Newtarr - Main entry point for the application
 Supports multiple Arr applications running concurrently
 """
 
@@ -662,8 +662,8 @@ def start_hourly_cap_scheduler():
     logger.info(f"Hourly API cap scheduler started. Thread is alive: {hourly_cap_scheduler_thread.is_alive()}")
 
 def start_newtarr():
-    """Main entry point for NewtArr background tasks."""
-    logger.info(f"--- Starting NewtArr Background Tasks v{__version__} --- ")
+    """Main entry point for Newtarr background tasks."""
+    logger.info(f"--- Starting Newtarr Background Tasks v{__version__} --- ")
     
     # Perform initial settings migration if specified (e.g., via env var or arg)
     if os.environ.get("NEWTARR_RUN_MIGRATION", "false").lower() == "true":
@@ -715,4 +715,4 @@ def start_newtarr():
         if not stop_event.is_set():
              stop_event.set() # Ensure stop is signaled if loop exited unexpectedly
         shutdown_threads()
-        logger.info("--- NewtArr Background Tasks stopped --- ")
+        logger.info("--- Newtarr Background Tasks stopped --- ")

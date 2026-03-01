@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Installation Guide - NewtArr Documentation</title>
+    <title>Installation Guide - Newtarr Documentation</title>
     <link rel="stylesheet" href="../css/main.css">
     <script src="../js/main.js" defer></script>
 </head>
 <body>
     <div class="sidebar">
         <div class="sidebar-logo">
-            <img src="../images/newtarr-logo.png" alt="NewtArr Logo">
-            <h2>NewtArr</h2>
+            <img src="../images/newtarr-logo.png" alt="Newtarr Logo">
+            <h2>Newtarr</h2>
         </div>
 
         <nav class="sidebar-nav">
@@ -48,12 +48,12 @@
             <h1>Installation Guide</h1>
 
             <section class="installation-overview">
-                <p>This guide will walk you through the installation process for NewtArr. NewtArr can be installed in several ways depending on your preference and system configuration.</p>
+                <p>This guide will walk you through the installation process for Newtarr. Newtarr can be installed in several ways depending on your preference and system configuration.</p>
             </section>
 
             <section class="system-requirements">
                 <h2>System Requirements</h2>
-                <p>Before installing NewtArr, ensure your system meets the following requirements:</p>
+                <p>Before installing Newtarr, ensure your system meets the following requirements:</p>
 
                 <table>
                     <tr>
@@ -103,7 +103,7 @@
                     <div class="tab-content">
                         <div class="tab-pane active" id="docker">
                             <h3>Docker Installation</h3>
-                            <p>The recommended way to install NewtArr is using Docker and Docker Compose. This method ensures that all dependencies are correctly installed and configured.</p>
+                            <p>The recommended way to install Newtarr is using Docker and Docker Compose. This method ensures that all dependencies are correctly installed and configured.</p>
 
                             <h4>Prerequisites</h4>
                             <ul>
@@ -122,7 +122,7 @@
                                 <li>Run the Docker Compose command:
                                     <pre><code>docker-compose up -d</code></pre>
                                 </li>
-                                <li>Access NewtArr through your browser:
+                                <li>Access Newtarr through your browser:
                                     <pre><code>http://localhost:7575</code></pre>
                                 </li>
                             </ol>
@@ -161,7 +161,7 @@ services:
                             </ul>
 
                             <h4>One-line Installation</h4>
-                            <p>Run the following command to install NewtArr:</p>
+                            <p>Run the following command to install Newtarr:</p>
                             <pre><code>curl -sSL https://install.newtarr.io | bash</code></pre>
 
                             <h4>Advanced Options</h4>
@@ -179,7 +179,7 @@ services:
 
                         <div class="tab-pane" id="manual">
                             <h3>Manual Installation</h3>
-                            <p>If you prefer to install NewtArr manually, follow these steps based on your operating system.</p>
+                            <p>If you prefer to install Newtarr manually, follow these steps based on your operating system.</p>
 
                             <h4>Linux (Ubuntu/Debian)</h4>
                             <ol>
@@ -250,15 +250,15 @@ sudo apt install -y nodejs npm git</code></pre>
                 <h2>Post Installation</h2>
 
                 <h3>Initial Setup</h3>
-                <p>After installing NewtArr, you'll need to complete the initial setup:</p>
+                <p>After installing Newtarr, you'll need to complete the initial setup:</p>
                 <ol>
                     <li>Access the web interface (default: <code>http://localhost:7575</code>)</li>
                     <li>Create an administrator account when prompted</li>
                     <li>Follow the setup wizard to configure your media paths and integrate with media applications (Sonarr, Radarr, etc.)</li>
                 </ol>
 
-                <h3>Updating NewtArr</h3>
-                <p>To update NewtArr to the latest version:</p>
+                <h3>Updating Newtarr</h3>
+                <p>To update Newtarr to the latest version:</p>
 
                 <h4>Docker Installation</h4>
                 <pre><code>cd /path/to/newtarr
@@ -292,7 +292,7 @@ id $(whoami)</code></pre>
 
                 <div class="issue-card">
                     <h4>Connectivity problems</h4>
-                    <p>If you can't connect to NewtArr after installation:</p>
+                    <p>If you can't connect to Newtarr after installation:</p>
                     <ul>
                         <li>Check if the service is running: <code>docker ps | grep newtarr</code></li>
                         <li>Check the logs: <code>docker logs newtarr</code></li>
@@ -307,7 +307,7 @@ id $(whoami)</code></pre>
             </div>
 
             <footer>
-                NewtArr | Installation Guide
+                Newtarr | Installation Guide
             </footer>
         </div>
     </div>

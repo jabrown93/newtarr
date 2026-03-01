@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sonarr missing episodes processing module for NewtArr
+Sonarr missing episodes processing module for Newtarr
 """
 
 import time

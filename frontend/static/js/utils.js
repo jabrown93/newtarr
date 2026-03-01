@@ -1,9 +1,9 @@
 /**
- * NewtArr - Utility Functions
+ * Newtarr - Utility Functions
  * Shared functions for use across the application
  */
 
-const NewtArrUtils = {
+const NewtarrUtils = {
     /**
      * Fetch with timeout using the global settings
      * @param {string} url - The URL to fetch
@@ -85,5 +85,5 @@ const NewtArrUtils = {
 
 // If running in Node.js environment
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = NewtArrUtils;
+    module.exports = NewtarrUtils;
 }

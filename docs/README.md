@@ -1,6 +1,6 @@
-# NewtArr Documentation
+# Newtarr Documentation
 
-This directory contains the official documentation for the NewtArr project, which is automatically published to [https://jabrown93.github.io/newtarr/docs](https://jabrown93.github.io/newtarr/docs).
+This directory contains the official documentation for the Newtarr project, which is automatically published to [https://jabrown93.github.io/newtarr/docs](https://jabrown93.github.io/newtarr/docs).
 
 ## Structure
 

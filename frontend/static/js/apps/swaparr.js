@@ -2,7 +2,7 @@
 
 (function(app) {
     if (!app) {
-        console.error("NewtArr App core is not loaded!");
+        console.error("Newtarr App core is not loaded!");
         return;
     }
 
@@ -205,7 +205,7 @@
                 }
                 
                 // Update the panel content
-                const escCfg = NewtArrUtils.escapeHtml;
+                const escCfg = NewtarrUtils.escapeHtml;
                 configPanel.innerHTML = `
                     <div class="swaparr-config">
                         <h3>Swaparr${this.logData.config.platform ? ' — ' + escCfg(this.logData.config.platform) : ''}</h3>
@@ -256,7 +256,7 @@
                 
                 // Add each download as a row
                 this.logData.downloads.forEach(download => {
-                    const esc = NewtArrUtils.escapeHtml;
+                    const esc = NewtarrUtils.escapeHtml;
                     // Apply status-specific CSS class
                     let statusClass = download.status.toLowerCase();
 
@@ -311,7 +311,7 @@
             for (const logLine of this.logData.rawLogs) {
                 const logEntry = document.createElement('div');
                 logEntry.className = 'log-entry';
-                logEntry.innerHTML = `<span class="log-message">${NewtArrUtils.escapeHtml(logLine)}</span>`;
+                logEntry.innerHTML = `<span class="log-message">${NewtarrUtils.escapeHtml(logLine)}</span>`;
                 
                 // Basic level detection
                 if (logLine.includes('ERROR')) logEntry.classList.add('log-error');

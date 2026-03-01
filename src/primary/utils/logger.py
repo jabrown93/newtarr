@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Logging configuration for NewtArr
+Logging configuration for Newtarr
 Supports separate log files for each application type
 """
 
@@ -33,7 +33,7 @@ logger: Optional[logging.Logger] = None
 app_loggers: Dict[str, logging.Logger] = {}
 
 def setup_main_logger(debug_mode=None):
-    """Set up the main NewtArr logger."""
+    """Set up the main Newtarr logger."""
     global logger
     log_name = "newtarr"
     log_file = MAIN_LOG_FILE

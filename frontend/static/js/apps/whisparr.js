@@ -1,5 +1,5 @@
 /**
- * Whisparr.js - Handles Whisparr settings and interactions in the NewtArr UI
+ * Whisparr.js - Handles Whisparr settings and interactions in the Newtarr UI
  */
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -57,7 +57,7 @@ function setupWhisparrForm() {
         }
         
         // Direct connection test - let the backend handle version checking
-        NewtArrUtils.fetchWithTimeout('/api/whisparr/test-connection', {
+        NewtarrUtils.fetchWithTimeout('/api/whisparr/test-connection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -133,7 +133,7 @@ function setupWhisparrForm() {
 
         const wasSettingsChanged = typeof newtarrUI !== 'undefined' ? newtarrUI.settingsChanged : false;
         
-        NewtArrUtils.fetchWithTimeout('/api/whisparr/get-versions')
+        NewtarrUtils.fetchWithTimeout('/api/whisparr/get-versions')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch Whisparr version');

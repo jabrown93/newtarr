@@ -1,5 +1,5 @@
 /**
- * Eros.js - Handles Eros settings and interactions in the NewtArr UI
+ * Eros.js - Handles Eros settings and interactions in the Newtarr UI
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -57,7 +57,7 @@ function setupErosForm() {
         }
         
         // Call API to test connection
-        NewtArrUtils.fetchWithTimeout('/api/eros/test-connection', {
+        NewtarrUtils.fetchWithTimeout('/api/eros/test-connection', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -134,7 +134,7 @@ function getErosVersion() {
     }
     
     // Endpoint to get version info - using the test endpoint since it returns version
-    NewtArrUtils.fetchWithTimeout('/api/eros/test-connection', {
+    NewtarrUtils.fetchWithTimeout('/api/eros/test-connection', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
