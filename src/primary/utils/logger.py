@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Logging configuration for Huntarr
+Logging configuration for Newtarr
 Supports separate log files for each application type
 """
 
@@ -15,7 +15,7 @@ LOG_DIR = pathlib.Path("/config/logs") # Changed path
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # Default log file for general messages
-MAIN_LOG_FILE = LOG_DIR / "huntarr.log"
+MAIN_LOG_FILE = LOG_DIR / "newtarr.log"
 
 # App-specific log files
 APP_LOG_FILES = {
@@ -33,9 +33,9 @@ logger: Optional[logging.Logger] = None
 app_loggers: Dict[str, logging.Logger] = {}
 
 def setup_main_logger(debug_mode=None):
-    """Set up the main Huntarr logger."""
+    """Set up the main Newtarr logger."""
     global logger
-    log_name = "huntarr"
+    log_name = "newtarr"
     log_file = MAIN_LOG_FILE
 
     # Determine debug mode safely
@@ -70,7 +70,7 @@ def setup_main_logger(debug_mode=None):
     file_handler.setLevel(logging.DEBUG if use_debug_mode else logging.INFO)
 
     # Set format for the main logger
-    log_format = "%(asctime)s - huntarr - %(levelname)s - %(message)s"
+    log_format = "%(asctime)s - newtarr - %(levelname)s - %(message)s"
     formatter = logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S")
     console_handler.setFormatter(formatter)
     file_handler.setFormatter(formatter)
@@ -105,7 +105,7 @@ def get_logger(app_type: str) -> logging.Logger:
         assert logger is not None
         return logger
 
-    log_name = f"huntarr.{app_type}"
+    log_name = f"newtarr.{app_type}"
     if log_name in app_loggers:
         # Return cached logger instance
         return app_loggers[log_name]
@@ -113,7 +113,7 @@ def get_logger(app_type: str) -> logging.Logger:
     # If not cached, set up a new logger for this app type
     app_logger = logging.getLogger(log_name)
     
-    # Prevent propagation to the main 'huntarr' logger or root logger
+    # Prevent propagation to the main 'newtarr' logger or root logger
     app_logger.propagate = False
     
     # Determine debug mode setting safely
@@ -140,7 +140,7 @@ def get_logger(app_type: str) -> logging.Logger:
     file_handler.setLevel(logging.DEBUG if debug_mode else logging.INFO)
     
     # Set a distinct format for this app log
-    log_format = f"%(asctime)s - huntarr.{app_type} - %(levelname)s - %(message)s"
+    log_format = f"%(asctime)s - newtarr.{app_type} - %(levelname)s - %(message)s"
     formatter = logging.Formatter(log_format, datefmt="%Y-%m-%d %H:%M:%S")
     
     console_handler.setFormatter(formatter)

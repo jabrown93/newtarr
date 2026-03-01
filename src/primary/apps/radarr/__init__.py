@@ -1,5 +1,5 @@
 """
-Radarr app module for Huntarr
+Radarr app module for Newtarr
 Contains functionality for missing movies and quality upgrades in Radarr
 """
 

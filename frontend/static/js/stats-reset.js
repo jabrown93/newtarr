@@ -47,8 +47,8 @@ function resetStatsUI() {
     });
     
     // Show success notification if available
-    if (window.huntarrUI && typeof window.huntarrUI.showNotification === 'function') {
-        window.huntarrUI.showNotification('Statistics reset successfully', 'success');
+    if (window.newtarrUI && typeof window.newtarrUI.showNotification === 'function') {
+        window.newtarrUI.showNotification('Statistics reset successfully', 'success');
     }
 }
 
@@ -60,8 +60,8 @@ function resetStatsUI() {
 function resetStatsAPI(appType = null) {
     const requestBody = appType ? { app_type: appType } : {};
     
-    // Use the public endpoint that doesn't require authentication
-    return fetch('/api/stats/reset_public', {
+    // Use the authenticated endpoint
+    return fetch('/api/stats/reset', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

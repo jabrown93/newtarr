@@ -1,9 +1,9 @@
 /**
- * Huntarr - Utility Functions
+ * Newtarr - Utility Functions
  * Shared functions for use across the application
  */
 
-const HuntarrUtils = {
+const NewtarrUtils = {
     /**
      * Fetch with timeout using the global settings
      * @param {string} url - The URL to fetch
@@ -14,11 +14,11 @@ const HuntarrUtils = {
         // Get the API timeout from global settings, default to 120 seconds if not set
         let apiTimeout = 120000; // Default 120 seconds in milliseconds
         
-        // Try to get timeout from huntarrUI if available
-        if (window.huntarrUI && window.huntarrUI.originalSettings && 
-            window.huntarrUI.originalSettings.general && 
-            window.huntarrUI.originalSettings.general.api_timeout) {
-            apiTimeout = window.huntarrUI.originalSettings.general.api_timeout * 1000;
+        // Try to get timeout from newtarrUI if available
+        if (window.newtarrUI && window.newtarrUI.originalSettings && 
+            window.newtarrUI.originalSettings.general && 
+            window.newtarrUI.originalSettings.general.api_timeout) {
+            apiTimeout = window.newtarrUI.originalSettings.general.api_timeout * 1000;
         }
         
         // Create abort controller for timeout
@@ -53,19 +53,37 @@ const HuntarrUtils = {
     getApiTimeout: function() {
         // Default value
         let timeout = 120;
-        
+
         // Try to get from global settings
-        if (window.huntarrUI && window.huntarrUI.originalSettings && 
-            window.huntarrUI.originalSettings.general && 
-            window.huntarrUI.originalSettings.general.api_timeout) {
-            timeout = window.huntarrUI.originalSettings.general.api_timeout;
+        if (window.newtarrUI && window.newtarrUI.originalSettings &&
+            window.newtarrUI.originalSettings.general &&
+            window.newtarrUI.originalSettings.general.api_timeout) {
+            timeout = window.newtarrUI.originalSettings.general.api_timeout;
         }
-        
+
         return timeout;
+    },
+
+    /**
+     * Escape HTML special characters to prevent XSS
+     * @param {string} text - The text to escape
+     * @returns {string} - The escaped text
+     */
+    escapeHtml: function(text) {
+        if (text === null || text === undefined) return '';
+        const str = String(text);
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return str.replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 };
 
 // If running in Node.js environment
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = HuntarrUtils;
+    module.exports = NewtarrUtils;
 }

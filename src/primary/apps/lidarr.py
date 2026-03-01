@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Lidarr Blueprint for Huntarr
+Lidarr Blueprint for Newtarr
 Defines Flask routes for interacting with Lidarr
 """
 

@@ -1,5 +1,5 @@
 /**
- * Huntarr - Apps Module
+ * Newtarr - Apps Module
  * Handles displaying and managing app settings for media server applications
  */
 
@@ -240,7 +240,7 @@ const appsModule = {
             })
             .catch(error => {
                 console.error(`Error loading ${app} settings:`, error);
-                appPanel.innerHTML = `<div class="error-panel"><i class="fas fa-exclamation-triangle"></i> Error loading settings: ${error.message}</div>`;
+                appPanel.innerHTML = `<div class="error-panel"><i class="fas fa-exclamation-triangle"></i> Error loading settings: ${NewtarrUtils.escapeHtml(error.message)}</div>`;
             });
     },
     
@@ -349,10 +349,10 @@ const appsModule = {
                 }
                 window._hasAppChanges[appType] = true;
                 
-                // Also update the huntarrUI tracking if available
-                if (window.huntarrUI && window.huntarrUI.formChanged) {
-                    window.huntarrUI.formChanged[appType] = true;
-                    window.huntarrUI.hasUnsavedChanges = true;
+                // Also update the newtarrUI tracking if available
+                if (window.newtarrUI && window.newtarrUI.formChanged) {
+                    window.newtarrUI.formChanged[appType] = true;
+                    window.newtarrUI.hasUnsavedChanges = true;
                 }
             }
         }
@@ -428,8 +428,8 @@ const appsModule = {
             document.getElementById('cleanuperrSection').classList.add('active');
             
             // Update the page title
-            if (huntarrUI && typeof huntarrUI.switchSection === 'function') {
-                huntarrUI.currentSection = 'cleanuparr';
+            if (newtarrUI && typeof newtarrUI.switchSection === 'function') {
+                newtarrUI.currentSection = 'cleanuparr';
                 // We're not calling the full switchSection as that would alter navigation
                 // Just update the title
                 const pageTitleElement = document.getElementById('currentPageTitle');
@@ -491,8 +491,8 @@ const appsModule = {
                 }
             }
             
-            if (typeof huntarrUI !== 'undefined' && typeof huntarrUI.showNotification === 'function') {
-                huntarrUI.showNotification('Error: Could not determine which app settings to save', 'error');
+            if (typeof newtarrUI !== 'undefined' && typeof newtarrUI.showNotification === 'function') {
+                newtarrUI.showNotification('Error: Could not determine which app settings to save', 'error');
             } else {
                 alert('Error: Could not determine which app settings to save');
             }
@@ -503,8 +503,8 @@ const appsModule = {
         const appPanel = document.getElementById(`${appType}Apps`);
         if (!appPanel) {
             console.error(`App panel not found for ${appType}`);
-            if (typeof huntarrUI !== 'undefined' && typeof huntarrUI.showNotification === 'function') {
-                huntarrUI.showNotification(`Error: App panel not found for ${appType}`, 'error');
+            if (typeof newtarrUI !== 'undefined' && typeof newtarrUI.showNotification === 'function') {
+                newtarrUI.showNotification(`Error: App panel not found for ${appType}`, 'error');
             } else {
                 alert(`Error: App panel not found for ${appType}`);
             }
@@ -538,8 +538,8 @@ const appsModule = {
             console.log(`Collected settings for ${appType}:`, settings);
         } catch (error) {
             console.error(`Error collecting settings for ${appType}:`, error);
-            if (typeof huntarrUI !== 'undefined' && typeof huntarrUI.showNotification === 'function') {
-                huntarrUI.showNotification(`Error collecting settings: ${error.message}`, 'error');
+            if (typeof newtarrUI !== 'undefined' && typeof newtarrUI.showNotification === 'function') {
+                newtarrUI.showNotification(`Error collecting settings: ${error.message}`, 'error');
             } else {
                 alert(`Error collecting settings: ${error.message}`);
             }
@@ -598,16 +598,16 @@ const appsModule = {
             }, 1000);
             
             // Show success notification
-            if (typeof huntarrUI !== 'undefined' && typeof huntarrUI.showNotification === 'function') {
-                huntarrUI.showNotification(`${appType} settings saved successfully`, 'success');
+            if (typeof newtarrUI !== 'undefined' && typeof newtarrUI.showNotification === 'function') {
+                newtarrUI.showNotification(`${appType} settings saved successfully`, 'success');
             } else {
                 alert(`${appType} settings saved successfully`);
             }
         })
         .catch(error => {
             console.error(`Error saving ${appType} settings:`, error);
-            if (typeof huntarrUI !== 'undefined' && typeof huntarrUI.showNotification === 'function') {
-                huntarrUI.showNotification(`Error saving settings: ${error.message}`, 'error');
+            if (typeof newtarrUI !== 'undefined' && typeof newtarrUI.showNotification === 'function') {
+                newtarrUI.showNotification(`Error saving settings: ${error.message}`, 'error');
             } else {
                 alert(`Error saving settings: ${error.message}`);
             }
@@ -676,12 +676,12 @@ const appsModule = {
             if (appType === 'readarr' || appType === 'lidarr' || appType === 'whisparr' || appType === 'whisparrv2') {
                 console.log(`Special handling for ${appType} to ensure changes are cleared`);
                 // Force additional global state updates
-                if (window.huntarrUI && window.huntarrUI.formChanged) {
-                    window.huntarrUI.formChanged[appType] = false;
+                if (window.newtarrUI && window.newtarrUI.formChanged) {
+                    window.newtarrUI.formChanged[appType] = false;
                 }
                 // Reset the global changed state tracker if this was the only app with changes
-                if (!this.settingsChanged && window.huntarrUI) {
-                    window.huntarrUI.hasUnsavedChanges = false;
+                if (!this.settingsChanged && window.newtarrUI) {
+                    window.newtarrUI.hasUnsavedChanges = false;
                 }
                 // Force immediate re-evaluation of the form state
                 setTimeout(() => {

@@ -1,5 +1,5 @@
 /**
- * Hourly API Cap Handling for Huntarr
+ * Hourly API Cap Handling for Newtarr
  * Fetches and updates the hourly API usage indicators on the dashboard
  */
 

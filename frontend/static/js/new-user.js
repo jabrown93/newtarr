@@ -1,5 +1,5 @@
 /**
- * Huntarr - User Settings Page
+ * Newtarr - User Settings Page
  * Handles user profile management functionality
  */
 
@@ -28,7 +28,7 @@
         
         // Apply dark mode
         document.body.classList.add('dark-theme');
-        localStorage.setItem('huntarr-dark-mode', 'true');
+        localStorage.setItem('newtarr-dark-mode', 'true');
         
         // Fetch user data
         fetchUserInfo();

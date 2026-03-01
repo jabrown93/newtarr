@@ -1,4 +1,4 @@
-/* Huntarr.io Documentation Styles */
+/* Newtarr Documentation Styles */
 :root {
     --primary-bg: #1a1d24;
     --secondary-bg: #252a34;
@@ -497,36 +497,36 @@ footer {
     body {
         flex-direction: column;
     }
-    
+
     .sidebar {
         width: 100%;
         height: auto;
         position: relative;
         padding: 10px 0;
     }
-    
+
     .main-content {
         margin-left: 0;
         padding: 20px;
     }
-    
+
     .container {
         padding: 15px;
     }
-    
+
     .app-icons {
         flex-wrap: wrap;
     }
-    
+
     .hero-content {
         flex-direction: column;
     }
-    
+
     .hero-logo {
         margin-right: 0;
         margin-bottom: 20px;
     }
-    
+
     .apps-list .app-list-item {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto auto;
@@ -643,4 +643,4 @@ footer {
 .app-card.whisparr-card .app-card-header {
     background-color: rgba(155, 89, 182, 0.2);
     border-bottom: 2px solid var(--whisparr-color);
-} 
+}

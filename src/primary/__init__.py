@@ -1,5 +1,5 @@
 """
-Huntarr - Find Missing & Upgrade Media Items
+Newtarr - Find Missing & Upgrade Media Items
 A unified tool for Sonarr, Radarr, Lidarr, and Readarr
 """
 

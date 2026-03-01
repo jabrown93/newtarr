@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Authentication module for Huntarr
+Authentication module for Newtarr
 Handles user creation, verification, and session management
 Including two-factor authentication
 """
@@ -13,6 +13,7 @@ import time
 import pathlib
 import base64
 import io
+import bcrypt
 import qrcode
 import pyotp # Ensure pyotp is imported
 import re # Import the re module for regex
@@ -27,7 +28,7 @@ USER_FILE = USER_DIR / "credentials.json"
 
 # Session settings
 SESSION_EXPIRY = 60 * 60 * 24 * 7  # 1 week in seconds
-SESSION_COOKIE_NAME = "huntarr_session"
+SESSION_COOKIE_NAME = "newtarr_session"
 
 # Store active sessions
 active_sessions = {}
@@ -60,8 +61,8 @@ def save_user_data(user_data: Dict[str, Any]) -> bool:
         
         # Set permissions after writing
         try:
-            os.chmod(USER_FILE, 0o644)
-            logger.debug(f"Set permissions 0o644 on {USER_FILE}")
+            os.chmod(USER_FILE, 0o600)
+            logger.debug(f"Set permissions 0o600 on {USER_FILE}")
         except Exception as e_perm:
             logger.warning(f"Could not set permissions on file {USER_FILE}: {e_perm}")
             
@@ -73,18 +74,44 @@ def save_user_data(user_data: Dict[str, Any]) -> bool:
 # --- End Helper functions ---
 
 def hash_password(password: str) -> str:
-    """Hash a password for storage"""
-    # Use SHA-256 with a salt
-    salt = secrets.token_hex(16)
-    pw_hash = hashlib.sha256((password + salt).encode()).hexdigest()
-    return f"{salt}:{pw_hash}"
+    """Hash a password for storage using bcrypt"""
+    pw_bytes = password.encode('utf-8')
+    hashed = bcrypt.hashpw(pw_bytes, bcrypt.gensalt(rounds=12))
+    return hashed.decode('utf-8')
 
-def verify_password(stored_password: str, provided_password: str) -> bool:
-    """Verify a password against its hash"""
+def _verify_legacy_password(stored_password: str, provided_password: str) -> bool:
+    """Verify a password against the legacy SHA-256 hash format (salt:hash)"""
     try:
         salt, pw_hash = stored_password.split(':', 1)
         verify_hash = hashlib.sha256((provided_password + salt).encode()).hexdigest()
         return secrets.compare_digest(verify_hash, pw_hash)
+    except Exception as e:
+        logger.error(f"Error verifying legacy password hash: {e}", exc_info=True)
+        return False
+
+def verify_password(stored_password: str, provided_password: str) -> bool:
+    """Verify a password against its hash (supports both bcrypt and legacy SHA-256)"""
+    try:
+        if ':' in stored_password:
+            # Legacy SHA-256 format (salt:hash) - verify and re-hash with bcrypt
+            if _verify_legacy_password(stored_password, provided_password):
+                # Re-hash with bcrypt on successful login
+                new_hash = hash_password(provided_password)
+                try:
+                    user_data = get_user_data()
+                    user_data["password"] = new_hash
+                    save_user_data(user_data)
+                    logger.info("Migrated password hash from SHA-256 to bcrypt")
+                except Exception as e:
+                    logger.warning(f"Failed to migrate password hash to bcrypt: {e}")
+                return True
+            return False
+        else:
+            # bcrypt format
+            return bcrypt.checkpw(
+                provided_password.encode('utf-8'),
+                stored_password.encode('utf-8')
+            )
     except Exception as e:
         logger.error(f"Error verifying password hash: {e}", exc_info=True)
         return False
@@ -149,7 +176,7 @@ def create_user(username: str, password: str) -> bool:
         # Set appropriate permissions on the file
         try:
             logger.info(f"Setting permissions on file: {USER_FILE}")
-            os.chmod(USER_FILE, 0o644)
+            os.chmod(USER_FILE, 0o600)
         except Exception as e:
             logger.warning(f"Could not set permissions on file {USER_FILE}: {e}")
         logger.info("User creation successful")
@@ -337,20 +364,27 @@ def authenticate_request():
         ]
         is_local = False
         
-        # Check if request is coming through a proxy
+        # Only trust X-Forwarded-For when the direct connection is from a local/trusted IP
+        # (i.e., the request is coming through a local reverse proxy)
         forwarded_for = request.headers.get('X-Forwarded-For')
-        if forwarded_for:
-            logger.debug(f"X-Forwarded-For header detected: {forwarded_for}")
+        remote_is_local = any(
+            remote_addr == network or (network.endswith('.') and remote_addr.startswith(network))
+            for network in local_networks
+        )
+        if forwarded_for and remote_is_local:
+            logger.debug(f"X-Forwarded-For header detected from trusted proxy ({remote_addr}): {forwarded_for}")
             # Take the first IP in the chain which is typically the client's real IP
             possible_client_ip = forwarded_for.split(',')[0].strip()
             logger.debug(f"Checking if forwarded IP {possible_client_ip} is local")
-            
+
             # Check if this forwarded IP is a local network IP
             for network in local_networks:
                 if possible_client_ip == network or (network.endswith('.') and possible_client_ip.startswith(network)):
                     is_local = True
                     logger.info(f"Forwarded IP {possible_client_ip} is a local network IP (matches {network})")
                     break
+        elif forwarded_for and not remote_is_local:
+            logger.warning(f"Ignoring X-Forwarded-For header from untrusted source ({remote_addr})")
         
         # Check if direct remote_addr is a local network IP if not already determined
         if not is_local:
@@ -414,7 +448,7 @@ def generate_2fa_secret(username: str) -> Tuple[str, str]:
     totp = pyotp.TOTP(secret)
     
     # Get the provisioning URI - Use the actual username here
-    uri = totp.provisioning_uri(name=username, issuer_name="NewtArr")
+    uri = totp.provisioning_uri(name=username, issuer_name="Newtarr")
     
     # Generate QR code
     qr = qrcode.QRCode(

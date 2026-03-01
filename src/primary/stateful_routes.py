@@ -4,8 +4,7 @@ Stateful Management API Routes
 Handles API endpoints for stateful management
 """
 
-from flask import Blueprint, jsonify, request, Response
-import json
+from flask import Blueprint, jsonify, request
 from src.primary.stateful_manager import (
     get_stateful_management_info,
     reset_stateful_management,
@@ -24,25 +23,15 @@ def get_info():
     """Get stateful management information."""
     try:
         info = get_stateful_management_info()
-        # Add CORS headers to allow access from frontend
-        response_data = {
+        return jsonify({
             "success": True,
             "created_at_ts": info.get("created_at_ts"),
             "expires_at_ts": info.get("expires_at_ts"),
             "interval_hours": info.get("interval_hours")
-        }
-        response = Response(json.dumps(response_data))
-        response.headers['Content-Type'] = 'application/json'
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
+        })
     except Exception as e:
         stateful_logger.error(f"Error getting stateful info: {e}")
-        # Return error response with proper headers
-        error_data = {"success": False, "message": f"Error getting stateful info: {str(e)}"}
-        response = Response(json.dumps(error_data), status=500)
-        response.headers['Content-Type'] = 'application/json'
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
+        return jsonify({"success": False, "message": f"Error getting stateful info: {str(e)}"}), 500
 
 @stateful_api.route('/reset', methods=['POST'])
 def reset_stateful():
@@ -50,25 +39,12 @@ def reset_stateful():
     try:
         success = reset_stateful_management()
         if success:
-            # Add CORS headers to allow access from frontend
-            response = Response(json.dumps({"success": True, "message": "Stateful management reset successfully"}))
-            response.headers['Content-Type'] = 'application/json'
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response
+            return jsonify({"success": True, "message": "Stateful management reset successfully"})
         else:
-            # Add CORS headers to allow access from frontend
-            response = Response(json.dumps({"success": False, "message": "Failed to reset stateful management"}), status=500)
-            response.headers['Content-Type'] = 'application/json'
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response
+            return jsonify({"success": False, "message": "Failed to reset stateful management"}), 500
     except Exception as e:
         stateful_logger.error(f"Error resetting stateful management: {e}")
-        # Return error response with proper headers
-        error_data = {"error": str(e)}
-        response = Response(json.dumps(error_data), status=500)
-        response.headers['Content-Type'] = 'application/json'
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
+        return jsonify({"error": str(e)}), 500
 
 @stateful_api.route('/update-expiration', methods=['POST'])
 def update_expiration():
@@ -77,39 +53,19 @@ def update_expiration():
         hours = request.json.get('hours')
         if hours is None or not isinstance(hours, int) or hours <= 0:
             stateful_logger.error(f"Invalid hours value for update-expiration: {hours}")
-            # Return error response with proper headers
-            error_data = {"success": False, "message": f"Invalid hours value: {hours}. Must be a positive integer."}
-            response = Response(json.dumps(error_data), status=400)
-            response.headers['Content-Type'] = 'application/json'
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response
-        
+            return jsonify({"success": False, "message": f"Invalid hours value: {hours}. Must be a positive integer."}), 400
+
         updated = update_lock_expiration(hours)
         if updated:
-            # Get updated info
             info = get_stateful_management_info()
-            # Add CORS headers to allow access from frontend
-            response_data = {
-                "success": True, 
+            return jsonify({
+                "success": True,
                 "message": f"Expiration updated to {hours} hours",
                 "expires_at": info.get("expires_at"),
                 "expires_date": info.get("expires_date")
-            }
-            response = Response(json.dumps(response_data))
-            response.headers['Content-Type'] = 'application/json'
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response
+            })
         else:
-            # Add CORS headers to allow access from frontend
-            response = Response(json.dumps({"success": False, "message": "Failed to update expiration"}), status=500)
-            response.headers['Content-Type'] = 'application/json'
-            response.headers['Access-Control-Allow-Origin'] = '*'
-            return response
+            return jsonify({"success": False, "message": "Failed to update expiration"}), 500
     except Exception as e:
         stateful_logger.error(f"Error updating expiration: {e}", exc_info=True)
-        # Return error response with proper headers
-        error_data = {"success": False, "message": f"Error updating expiration: {str(e)}"}
-        response = Response(json.dumps(error_data), status=500)
-        response.headers['Content-Type'] = 'application/json'
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
+        return jsonify({"success": False, "message": f"Error updating expiration: {str(e)}"}), 500

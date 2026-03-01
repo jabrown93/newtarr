@@ -1,11 +1,11 @@
 <div class="sidebar" id="sidebar">
     <div class="sidebar-top-line"></div>
     <div class="logo-container">
-        <span class="logo logo-large" aria-label="NewtArr"><i class="fas fa-dragon"></i></span>
-        <span class="logo logo-small" aria-label="NewtArr"><i class="fas fa-dragon"></i></span>
-        <h1>NewtArr</h1>
+        <span class="logo logo-large" aria-label="Newtarr"><i class="fas fa-dragon"></i></span>
+        <span class="logo logo-small" aria-label="Newtarr"><i class="fas fa-dragon"></i></span>
+        <h1>Newtarr</h1>
     </div>
-    
+
     <nav class="nav-menu">
         <!-- Core Navigation Group -->
         <div class="nav-group" style="margin-top: -10px;">
@@ -29,7 +29,7 @@
                 <span>Settings</span>
             </a>
         </div>
-        
+
         <!-- Features Group -->
         <div class="nav-group">
             <div class="nav-group-title">Features</div>
@@ -58,7 +58,7 @@
                 <span>User</span>
             </a>
         </div>
-        
+
     </nav>
 </div>
 
@@ -68,7 +68,7 @@
         color: #e74c3c;
         animation: pulse-heart 1.5s infinite alternate;
     }
-    
+
     @keyframes pulse-heart {
         0% {
             transform: scale(1);
@@ -79,7 +79,7 @@
             opacity: 1;
         }
     }
-    
+
     .sidebar {
         width: 250px;
         height: 100vh;
@@ -98,7 +98,7 @@
         position: relative;
         backdrop-filter: blur(5px); /* Add subtle blur for depth */
     }
-    
+
     /* Add horizontal line at the top of the sidebar */
     .sidebar-top-line {
         content: '';
@@ -111,7 +111,7 @@
         z-index: 2;
         box-shadow: 0 0 8px rgba(52, 152, 219, 0.4); /* Add subtle glow */
     }
-    
+
     /* Add vertical color line to right edge of sidebar */
     .sidebar::after {
         content: '';
@@ -124,7 +124,7 @@
         z-index: 2;
         box-shadow: none;
     }
-    
+
     /* Add matching vertical color line to left edge of sidebar */
     .sidebar::before {
         content: '';
@@ -136,7 +136,7 @@
         background: linear-gradient(to bottom, rgba(52, 152, 219, 0.6), rgba(155, 89, 182, 0.6)); /* Sonarr blue to Whisparr purple */
         z-index: 2;
     }
-    
+
     .logo-container {
         display: flex;
         align-items: center;
@@ -145,7 +145,7 @@
         margin-bottom: -15px;
         position: relative;
     }
-    
+
     /* Improve logo container with subtle background */
     .logo-container::after {
         content: '';
@@ -154,18 +154,18 @@
         right: 10px;
         bottom: 0;
         height: 1px;
-        background: linear-gradient(90deg, 
-            rgba(255, 255, 255, 0.01), 
-            rgba(255, 255, 255, 0.1), 
+        background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0.01),
+            rgba(255, 255, 255, 0.1),
             rgba(255, 255, 255, 0.01)
         );
     }
-    
+
     /* Remove the line under logo by setting this to empty */
     .logo-container::after {
         display: none;
     }
-    
+
     /* Define logo glowing animation */
     @keyframes logo-glow {
         0% { box-shadow: 0 0 15px #3498db, 0 0 5px rgba(52, 152, 219, 0.4); } /* Sonarr blue */
@@ -175,14 +175,14 @@
         80% { box-shadow: 0 0 15px #9b59b6, 0 0 5px rgba(155, 89, 182, 0.4); } /* Whisparr purple */
         100% { box-shadow: 0 0 15px #3498db, 0 0 5px rgba(52, 152, 219, 0.4); } /* Back to Sonarr blue */
     }
-    
+
     /* Define heart icon pulsing animation */
     @keyframes heart-pulse {
         0% { color: #ff4d6d; text-shadow: 0 0 10px #ff4d6d, 0 0 20px #ff4d6d; } /* Pink */
         50% { color: #ff0a33; text-shadow: 0 0 15px #ff0a33, 0 0 25px #ff0a33; } /* Red */
         100% { color: #ff4d6d; text-shadow: 0 0 10px #ff4d6d, 0 0 20px #ff4d6d; } /* Pink */
     }
-    
+
     .logo {
         width: 60px;
         height: 60px;
@@ -206,7 +206,7 @@
     .logo-small {
         display: none;
     }
-    
+
     .logo-container h1 {
         font-size: 22px;
         font-weight: 700;
@@ -225,7 +225,7 @@
         padding: 5px 0 20px 0;
         flex-grow: 1;
     }
-    
+
     .nav-item {
         display: flex;
         align-items: center;
@@ -238,7 +238,7 @@
         position: relative;
         overflow: hidden;
     }
-    
+
     /* Add hover effect for nav items */
     .nav-item::before {
         content: '';
@@ -250,7 +250,7 @@
         background: linear-gradient(to bottom, rgba(52, 152, 219, 0), rgba(52, 152, 219, 0));
         transition: all 0.3s ease;
     }
-    
+
     .nav-icon-wrapper {
         width: 38px;
         height: 38px;
@@ -264,7 +264,7 @@
         background: rgba(30, 39, 56, 0.3);
         border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    
+
     .nav-icon-wrapper i {
         font-size: 16px;
         position: absolute;
@@ -274,22 +274,22 @@
         transition: all 0.3s ease;
         filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
     }
-    
+
     /* Apply the pulsing animation to the heart icon */
     .heart-icon i {
         animation: heart-pulse 7.2s infinite ease-in-out;
     }
-    
+
     .nav-group {
         margin-top: 5px;
         margin-bottom: 15px;
     }
-    
+
     /* Specific adjustment for the Core nav group */
     .nav-group:first-of-type {
         margin-top: 0;
     }
-    
+
     .nav-group-title {
         font-size: 12px;
         font-weight: 700;
@@ -302,85 +302,85 @@
         text-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
         position: relative;
     }
-    
+
     .nav-item span {
         font-size: 14px;
         font-weight: 500;
         transition: all 0.3s ease;
         letter-spacing: 0.3px;
     }
-    
+
     .nav-item:hover {
         background: rgba(59, 130, 246, 0.15);
         color: #fff;
         transform: translateX(2px);
     }
-    
+
     .nav-item:hover .nav-icon-wrapper {
         background: rgba(59, 130, 246, 0.2);
         transform: scale(1.05);
     }
-    
+
     .nav-item:hover::before {
         background: linear-gradient(to bottom, rgba(52, 152, 219, 0.4), rgba(155, 89, 182, 0.4));
     }
-    
+
     .nav-item.active {
         background: linear-gradient(to right, rgba(59, 130, 246, 0.9), rgba(59, 130, 246, 0.7));
         color: #ffffff;
         box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
         transform: translateX(0);
     }
-    
+
     .nav-item.active .nav-icon-wrapper {
         background: rgba(255, 255, 255, 0.15);
         border-color: rgba(255, 255, 255, 0.2);
         transform: scale(1.1);
     }
-    
+
     .nav-item.active i {
         color: #ffffff;
         filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
     }
-    
+
     .nav-item.active::before {
         background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3));
     }
-    
+
     /* Mobile view optimization */
     @media (max-width: 768px) {
         .sidebar {
             width: 70px !important;
             overflow-x: hidden !important;
         }
-        
+
         /* Adjust vertical color lines on mobile */
         .sidebar::before,
         .sidebar::after {
             width: 1px;
         }
-        
+
         .logo-container {
             padding: 15px 5px !important;
             justify-content: center !important;
             flex-direction: column !important;
         }
-        
+
         .sidebar .nav-item span,
         .sidebar .nav-group-title {
             display: none;
         }
-        
+
         .sidebar .logo-container {
             justify-content: center;
             padding: 15px 0;
             height: 60px;
         }
-        
+
         .sidebar .logo-container h1 {
             display: none;
         }
-        
+
         .logo-large {
             display: none;
         }
@@ -395,18 +395,18 @@
         .logo-small i {
             font-size: 18px;
         }
-        
+
         .nav-menu {
             padding: 10px 0;
         }
-        
+
         .nav-item {
             width: 60px;
             justify-content: center;
             padding: 12px 0;
             margin-bottom: 8px;
         }
-        
+
         .nav-item:hover,
         .nav-item.active {
             width: 42px;
@@ -418,18 +418,18 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .nav-icon-wrapper {
             margin-right: 0;
             width: 32px;
             height: 32px;
         }
-        
+
         .nav-icon-wrapper i {
             font-size: 15px;
         }
     }
-    
+
     /* Adjust spacing for the sponsor link */
     .nav-menu a.nav-item:first-child {
         margin-top: 5px;
@@ -442,36 +442,36 @@
     function setActiveNavItem() {
         // Get all navigation items
         const navItems = document.querySelectorAll('.nav-item');
-        
+
         // Remove active class from all items
         navItems.forEach(item => {
             item.classList.remove('active');
         });
-        
+
         // Get current hash, or default to home if no hash
         let currentHash = window.location.hash;
         if (!currentHash) {
             currentHash = '#home';
         }
-        
+
         // Set the appropriate nav item as active
-        const selector = currentHash === '#home' ? '#homeNav' : 
+        const selector = currentHash === '#home' ? '#homeNav' :
                          currentHash === '#history' ? '#historyNav' :
                          currentHash === '#logs' ? '#logsNav' :
                          currentHash === '#apps' ? '#appsNav' :
                          currentHash === '#cleanuperr' ? '#appsNav' : // Cleanuperr uses the apps nav
                          currentHash === '#settings' ? '#settingsNav' :
                          currentHash === '#scheduling' ? '#schedulingNav' : '#homeNav';
-        
+
         const activeItem = document.querySelector(selector);
         if (activeItem) {
             activeItem.classList.add('active');
         }
     }
-    
+
     // Set active on page load
     document.addEventListener('DOMContentLoaded', setActiveNavItem);
-    
+
     // Update active when hash changes
     window.addEventListener('hashchange', setActiveNavItem);
 </script>

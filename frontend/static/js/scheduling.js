@@ -1,11 +1,11 @@
 /**
- * Scheduling functionality for Huntarr
+ * Scheduling functionality for Newtarr
  * Implements a SABnzbd-style scheduler for controlling Arr application behavior
  */
 
 // Define the schedules object in the global window scope to prevent redeclaration errors
 // This ensures the variable is only declared once no matter how many times the script loads
-window.huntarrSchedules = window.huntarrSchedules || {
+window.newtarrSchedules = window.newtarrSchedules || {
     global: [],
     sonarr: [],
     radarr: [],
@@ -16,7 +16,7 @@ window.huntarrSchedules = window.huntarrSchedules || {
 // Use an immediately invoked function expression to create a new scope
 (function() {
     // Reference the global schedules object
-    const schedules = window.huntarrSchedules;
+    const schedules = window.newtarrSchedules;
     
     /**
      * Capitalize the first letter of a string
@@ -113,7 +113,7 @@ function setupEventListeners() {
     
     // Only set up the event handler during initialization, not on every page render
     // Use a closure to ensure event listener is registered only once
-    if (!window.huntarrSchedulerInitialized) {
+    if (!window.newtarrSchedulerInitialized) {
         // Document level listener to catch delete actions regardless of when items are added
         document.addEventListener('click', function(e) {
             // Only react to delete buttons
@@ -134,7 +134,7 @@ function setupEventListeners() {
         });
         
         // Flag to prevent duplicate initialization
-        window.huntarrSchedulerInitialized = true;
+        window.newtarrSchedulerInitialized = true;
         console.debug('Scheduler event handlers initialized once');
     }
 }
@@ -480,8 +480,8 @@ function saveSchedules() {
                 if (data.success) {
                     console.debug('Schedules saved successfully');
                     // Show success toast notification
-                    if (window.huntarrUI && typeof window.huntarrUI.showNotification === 'function') {
-                        huntarrUI.showNotification('Schedules saved successfully!', 'success');
+                    if (window.newtarrUI && typeof window.newtarrUI.showNotification === 'function') {
+                        newtarrUI.showNotification('Schedules saved successfully!', 'success');
                     } else {
                         alert('Schedules saved successfully!'); // Fallback
                     }
@@ -681,14 +681,15 @@ function renderSchedules() {
         }
         
         // Build the schedule item HTML (checkbox removed but layout preserved)
+        const esc = NewtarrUtils.escapeHtml;
         scheduleItem.innerHTML = `
             <div class="schedule-item-checkbox"></div>
-            <div class="schedule-item-time">${formattedTime}</div>
-            <div class="schedule-item-days">${daysText}</div>
-            <div class="schedule-item-action">${actionText}</div>
-            <div class="schedule-item-app">${appText}</div>
+            <div class="schedule-item-time">${esc(formattedTime)}</div>
+            <div class="schedule-item-days">${esc(daysText)}</div>
+            <div class="schedule-item-action">${esc(actionText)}</div>
+            <div class="schedule-item-app">${esc(appText)}</div>
             <div class="schedule-item-actions">
-                <button class="icon-button delete-schedule" data-id="${schedule.id}" data-app-type="${schedule.appType}"><i class="fas fa-trash"></i></button>
+                <button class="icon-button delete-schedule" data-id="${esc(schedule.id)}" data-app-type="${esc(schedule.appType)}"><i class="fas fa-trash"></i></button>
             </div>
         `;
         
@@ -734,8 +735,8 @@ function addSchedule() {
     
     // Validate form inputs (basic validation)
     if (isNaN(hour) || isNaN(minute)) {
-        if (window.huntarrUI && typeof window.huntarrUI.showNotification === 'function') {
-            huntarrUI.showNotification('Please enter a valid hour and minute.', 'error');
+        if (window.newtarrUI && typeof window.newtarrUI.showNotification === 'function') {
+            newtarrUI.showNotification('Please enter a valid hour and minute.', 'error');
         } else {
             alert('Please enter a valid hour and minute.'); // Fallback
         }
@@ -743,9 +744,9 @@ function addSchedule() {
     }
     
     if (!anyDaySelected) {
-        // Assuming huntarrUI is globally available
-        if (window.huntarrUI && typeof window.huntarrUI.showNotification === 'function') {
-            huntarrUI.showNotification('Please select at least one day to save the schedule.', 'error');
+        // Assuming newtarrUI is globally available
+        if (window.newtarrUI && typeof window.newtarrUI.showNotification === 'function') {
+            newtarrUI.showNotification('Please select at least one day to save the schedule.', 'error');
         } else {
             alert('Please select at least one day to save the schedule.'); // Fallback
         }

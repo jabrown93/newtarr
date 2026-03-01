@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-State management module for Huntarr
+State management module for Newtarr
 Handles all persistence of program state
 """
 
@@ -16,7 +16,7 @@ CONFIG_DIR = os.environ.get('CONFIG_DIR', '/config')
 
 # Get the logger at module level
 from src.primary.utils.logger import get_logger
-logger = get_logger("huntarr")
+logger = get_logger("newtarr")
 
 def get_state_file_path(app_type, state_name):
     """
