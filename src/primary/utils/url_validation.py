@@ -96,15 +96,19 @@ class _IPPinningAdapter(HTTPAdapter):
     def send(self, request, *args, **kwargs):
         # Replace hostname with resolved IP in the URL for the actual connection
         parsed = urlparse(request.url)
+        # Wrap IPv6 addresses in brackets per RFC 2732
+        ip = ipaddress.ip_address(self._resolved_ip)
+        ip_str = f"[{ip}]" if ip.version == 6 else str(ip)
         # Reconstruct with IP instead of hostname, preserving port if present
         if parsed.port:
-            netloc = f"{self._resolved_ip}:{parsed.port}"
+            netloc = f"{ip_str}:{parsed.port}"
         else:
-            netloc = self._resolved_ip
+            netloc = ip_str
         request.url = urlunparse(parsed._replace(netloc=netloc))
 
-        # Set Host header to original hostname so the server routes correctly
-        request.headers.setdefault("Host", self._original_hostname)
+        # Explicitly set Host header to original hostname so virtual hosts and
+        # TLS hostname verification use the correct name, not the pinned IP
+        request.headers["Host"] = self._original_hostname
 
         return super().send(request, *args, **kwargs)
 

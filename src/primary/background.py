@@ -665,11 +665,6 @@ def start_newtarr():
     """Main entry point for Newtarr background tasks."""
     logger.info(f"--- Starting Newtarr Background Tasks v{__version__} --- ")
     
-    # Perform initial settings migration if specified (e.g., via env var or arg)
-    if os.environ.get("NEWTARR_RUN_MIGRATION", "false").lower() == "true":
-        logger.info("Running settings migration from newtarr.json (if found)...")
-        settings_manager.migrate_from_newtarr_json()
-        
     # Start the hourly API cap scheduler
     try:
         start_hourly_cap_scheduler()
