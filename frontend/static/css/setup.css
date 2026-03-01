@@ -436,3 +436,29 @@
 }
 
 .initially-hidden { display: none; }
+
+/* setup.html inline style replacements */
+.setup-tagline { margin: 5px 0 0; color: rgba(255,255,255,0.4); font-size: 12px; font-style: italic; }
+.setup-tagline a { color: #8D9E40; }
+.setup-verification-group { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+.setup-verification-label { display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+.setup-verification-icon { margin-right: 8px; color: #8D9E40; }
+.setup-verification-input { text-align: center; width: 60%; max-width: 300px; }
+.setup-2fa-btn-margin { margin-right: 10px; }
+.setup-auth-group { margin-top: 25px; }
+.setup-auth-card { background-color: rgba(28, 36, 54, 0.8); border-radius: 10px; padding: 15px; border: 1px solid rgba(80, 118, 46, 0.3); }
+.setup-auth-card-inner { display: flex; align-items: flex-start; }
+.setup-auth-icon-col { margin-right: 12px; margin-top: 2px; }
+.setup-auth-shield-icon { color: #8D9E40; font-size: 18px; }
+.setup-auth-label { font-weight: 600; display: flex; align-items: center; margin-bottom: 8px; }
+.setup-auth-select-wrap { margin-bottom: 10px; }
+.setup-auth-mode-select { width: 100%; padding: 8px; background-color: rgba(28, 36, 54, 0.8); color: #fff; border: 1px solid rgba(80, 118, 46, 0.6); border-radius: 5px; }
+.setup-auth-help { font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-top: 5px; }
+.setup-auth-warning { font-size: 13px; color: #ff9966; margin-top: 5px; }
+.setup-complete-center { text-align: center; margin-top: 20px; }
+.setup-thankyou-card { background-color: #2c2c2c; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+.setup-thankyou-title { font-weight: bold; margin-top: 10px; }
+.setup-thankyou-text { color: #bbb; font-size: 0.95em; margin-top: 10px; line-height: 1.4; text-align: left; }
+.setup-thankyou-text a { color: #8D9E40; }
+.setup-success-icon { color: #4CAF50; }
+.setup-actions-center { justify-content: center; }

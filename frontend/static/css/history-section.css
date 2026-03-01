@@ -781,3 +781,10 @@
             }
         }
     }
+
+/* Table column widths */
+.history-table th:nth-child(1) { min-width: 280px; width: 40%; }
+.history-table th:nth-child(2) { min-width: 100px; width: 15%; }
+.history-table th:nth-child(3) { min-width: 100px; width: 15%; }
+.history-table th:nth-child(4) { min-width: 120px; width: 15%; }
+.history-table th:nth-child(5) { min-width: 120px; width: 15%; }

@@ -20,7 +20,7 @@
         <div class="login-header">
             <span class="login-logo" aria-label="Newtarr"><i class="fas fa-dragon"></i></span>
             <h1>Newtarr</h1>
-            <p style="margin: 5px 0 0; color: rgba(255,255,255,0.4); font-size: 12px; font-style: italic;">a neutered fork of Newtarr v6.6.3, from simpler times, maintained by <a href="https://store.elfhosted.com" target="_blank" rel="noopener" style="color: #8D9E40;">ElfHosted</a></p>
+            <p class="setup-tagline">a neutered fork of Newtarr v6.6.3, from simpler times, maintained by <a href="https://store.elfhosted.com" target="_blank" rel="noopener">ElfHosted</a></p>
         </div>
         <div class="login-form">
             <div class="setup-steps">
@@ -74,16 +74,16 @@
                     <p>Or enter this code manually in your app:</p>
                     <div class="secret-key" id="secretKey">Generating...</div>
 
-                    <div class="form-group" style="display: flex; flex-direction: column; align-items: center; margin: 20px 0;">
-                        <label for="verificationCode" style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                            <i class="fas fa-shield-alt" style="margin-right: 8px; color: #8D9E40;"></i>
+                    <div class="form-group setup-verification-group">
+                        <label for="verificationCode" class="setup-verification-label">
+                            <i class="fas fa-shield-alt setup-verification-icon"></i>
                             <span>Verification Code</span>
                         </label>
-                        <input type="text" id="verificationCode" placeholder="Enter 6-digit code" maxlength="6" style="text-align: center; width: 60%; max-width: 300px;">
+                        <input type="text" id="verificationCode" placeholder="Enter 6-digit code" maxlength="6" class="setup-verification-input">
                     </div>
 
                     <div class="form-actions">
-                        <button type="button" id="twoFactorNextButton" class="next-button" style="margin-right: 10px;">
+                        <button type="button" id="twoFactorNextButton" class="next-button setup-2fa-btn-margin">
                             <i class="fas fa-check"></i> Verify & Continue
                         </button>
                         <button id="skip2FALink" class="skip-button">
@@ -97,29 +97,29 @@
                 <h2>Choose Authentication Mode</h2>
                 <p>Select how users will authenticate with Newtarr</p>
 
-                <div class="form-group" style="margin-top: 25px;">
-                    <div style="background-color: rgba(28, 36, 54, 0.8); border-radius: 10px; padding: 15px; border: 1px solid rgba(80, 118, 46, 0.3);">
-                        <div style="display: flex; align-items: flex-start;">
-                            <div style="margin-right: 12px; margin-top: 2px;">
-                                <i class="fas fa-shield-alt" style="color: #8D9E40; font-size: 18px;"></i>
+                <div class="form-group setup-auth-group">
+                    <div class="setup-auth-card">
+                        <div class="setup-auth-card-inner">
+                            <div class="setup-auth-icon-col">
+                                <i class="fas fa-shield-alt setup-auth-shield-icon"></i>
                             </div>
                             <div>
-                                <label for="auth_mode" style="font-weight: 600; display: flex; align-items: center; margin-bottom: 8px;">
+                                <label for="auth_mode" class="setup-auth-label">
                                     <span>Authentication Mode</span>
                                 </label>
-                                <div style="margin-bottom: 10px;">
-                                    <select id="auth_mode" style="width: 100%; padding: 8px; background-color: rgba(28, 36, 54, 0.8); color: #fff; border: 1px solid rgba(80, 118, 46, 0.6); border-radius: 5px;">
+                                <div class="setup-auth-select-wrap">
+                                    <select id="auth_mode" class="setup-auth-mode-select">
                                         <option value="login" selected>Login Mode</option>
                                         <option value="local_bypass">Local Bypass Mode</option>
                                         <option value="no_login">No Login Mode</option>
                                     </select>
                                 </div>
-                                <div style="font-size: 13px; color: rgba(255, 255, 255, 0.7); margin-top: 5px;">
+                                <div class="setup-auth-help">
                                     <p><strong>Login Mode:</strong> Standard login required for all connections</p>
                                     <p><strong>Local Bypass Mode:</strong> Only local network connections (192.168.x.x, 10.x.x.x) bypass login</p>
                                     <p><strong>No Login Mode:</strong> Completely disable authentication when running behind a reverse proxy</p>
                                 </div>
-                                <p style="font-size: 13px; color: #ff9966; margin-top: 5px;">
+                                <p class="setup-auth-warning">
                                     <i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> Only use No Login Mode if your reverse proxy (e.g., Cloudflare, Nginx) is properly securing access!
                                 </p>
                             </div>
@@ -138,19 +138,19 @@
             <div id="setupComplete" class="setup-section">
                 <h2>Setup Complete</h2>
                 <p>Your Newtarr account has been created successfully!</p>
-                <div style="text-align: center; margin-top: 20px;">
-                    <div style="background-color: #2c2c2c; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <div class="setup-complete-center">
+                    <div class="setup-thankyou-card">
                         <p>
                             <i class="fas fa-heart thankyou-heart"></i>
                         </p>
-                        <p style="font-weight: bold; margin-top: 10px;">Thank You For Using Newtarr</p>
-                        <p style="color: #bbb; font-size: 0.95em; margin-top: 10px; line-height: 1.4; text-align: left;">
-                            A neutered fork of Newtarr v6.6.3, from simpler times, maintained by <a href="https://store.elfhosted.com" target="_blank" rel="noopener" style="color: #8D9E40;">ElfHosted</a>.
+                        <p class="setup-thankyou-title">Thank You For Using Newtarr</p>
+                        <p class="setup-thankyou-text">
+                            A neutered fork of Newtarr v6.6.3, from simpler times, maintained by <a href="https://store.elfhosted.com" target="_blank" rel="noopener">ElfHosted</a>.
                         </p>
                     </div>
-                    <p><i class="fas fa-check-circle" style="color: #4CAF50;"></i> You can now proceed to the main interface.</p>
+                    <p><i class="fas fa-check-circle setup-success-icon"></i> You can now proceed to the main interface.</p>
                 </div>
-                <div class="form-actions" style="justify-content: center;">
+                <div class="form-actions setup-actions-center">
                     <button type="button" id="finishSetupButton" class="submit-button">
                         <i class="fas fa-home"></i> Go to Dashboard
                     </button>
