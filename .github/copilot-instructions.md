@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-NewtArr is a Python/Flask application that orchestrates media hunting across *arr applications (Sonarr, Radarr, Lidarr, Readarr, Whisparr, Eros, Swaparr). It is a fork of Huntarr v6.6.3, maintained by ElfHosted. The app continuously searches media libraries for missing content and quality upgrades while rate-limiting indexer usage.
+NewtArr is a Python/Flask application that orchestrates media hunting across *arr applications (Sonarr, Radarr, Lidarr, Readarr, Whisparr, Eros, Swaparr). It is a fork of NewtArr v6.6.3, maintained by ElfHosted. The app continuously searches media libraries for missing content and quality upgrades while rate-limiting indexer usage.
 
 ## Build & Run
 
@@ -55,7 +55,7 @@ Adding a new *arr app requires replicating all of the above files and registerin
 
 **Known app types**: `KNOWN_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", "general", "swaparr"]` — this list in `settings_manager.py` must be updated when adding a new app.
 
-**Authentication**: `src/primary/auth.py` handles session cookies (`huntarr_session`), bcrypt passwords, TOTP 2FA, and proxy auth bypass (for SSO via `authenticate_request()`). User credentials are stored in `/config/user/credentials.json`.
+**Authentication**: `src/primary/auth.py` handles session cookies (`newtarr_session`), bcrypt passwords, TOTP 2FA, and proxy auth bypass (for SSO via `authenticate_request()`). User credentials are stored in `/config/user/credentials.json`.
 
 ## Key Environment Variables
 

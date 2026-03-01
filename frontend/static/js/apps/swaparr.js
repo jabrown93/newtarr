@@ -2,7 +2,7 @@
 
 (function(app) {
     if (!app) {
-        console.error("Huntarr App core is not loaded!");
+        console.error("NewtArr App core is not loaded!");
         return;
     }
 
@@ -42,7 +42,7 @@
         },
 
         setupLogProcessor: function() {
-            // Setup a listener for custom event from huntarrUI's log processing
+            // Setup a listener for custom event from newtarrUI's log processing
             document.addEventListener('swaparrLogReceived', (event) => {
                 console.log('[Swaparr Module] Received log event:', event.detail.logData.substring(0, 100) + '...');
                 this.processLogLine(event.detail.logData);
@@ -205,7 +205,7 @@
                 }
                 
                 // Update the panel content
-                const escCfg = HuntarrUtils.escapeHtml;
+                const escCfg = NewtArrUtils.escapeHtml;
                 configPanel.innerHTML = `
                     <div class="swaparr-config">
                         <h3>Swaparr${this.logData.config.platform ? ' — ' + escCfg(this.logData.config.platform) : ''}</h3>
@@ -256,7 +256,7 @@
                 
                 // Add each download as a row
                 this.logData.downloads.forEach(download => {
-                    const esc = HuntarrUtils.escapeHtml;
+                    const esc = NewtArrUtils.escapeHtml;
                     // Apply status-specific CSS class
                     let statusClass = download.status.toLowerCase();
 
@@ -311,7 +311,7 @@
             for (const logLine of this.logData.rawLogs) {
                 const logEntry = document.createElement('div');
                 logEntry.className = 'log-entry';
-                logEntry.innerHTML = `<span class="log-message">${HuntarrUtils.escapeHtml(logLine)}</span>`;
+                logEntry.innerHTML = `<span class="log-message">${NewtArrUtils.escapeHtml(logLine)}</span>`;
                 
                 // Basic level detection
                 if (logLine.includes('ERROR')) logEntry.classList.add('log-error');
@@ -380,4 +380,4 @@
         }
     });
 
-})(window.huntarrUI); // Pass the global UI object
+})(window.newtarrUI); // Pass the global UI object

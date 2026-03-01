@@ -1,5 +1,5 @@
 """
-Whisparr app module for Huntarr
+Whisparr app module for NewtArr
 Contains functionality for missing items and quality upgrades in Whisparr
 
 Exclusively supports the v2 API (legacy).

@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { json } from '@sveltejs/kit';
-import { invalidateCache } from '$lib/config'; // Assuming config.js handles huntarr.json read/write
+import { invalidateCache } from '$lib/config'; // Assuming config.js handles newtarr.json read/write
 
-const CONFIG_FILE = path.resolve('huntarr.json'); // Path to the main config file
+const CONFIG_FILE = path.resolve('newtarr.json'); // Path to the main config file
 const DEFAULT_CONFIGS_DIR = path.resolve('src/primary/default_configs'); // Path to new default configs
 
 // Helper function to load default settings for a specific app

@@ -1,17 +1,17 @@
 services:
-  huntarr:
+  newtarr:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: huntarr
+    container_name: newtarr
     ports:
       - "9705:9705"
     volumes:
-      - huntarr-config:/config
+      - newtarr-config:/config
     environment:
       - TZ=America/New_York
     restart: unless-stopped
 
 volumes:
-  huntarr-config:
-    name: huntarr-config
+  newtarr-config:
+    name: newtarr-config

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Settings migration utility for Huntarr
+Settings migration utility for NewtArr
 Migrates settings from nested structure to flat structure
 """
 
@@ -15,7 +15,7 @@ logger = logging.getLogger("settings_migration")
 
 # Settings file path
 SETTINGS_DIR = pathlib.Path("/config")
-SETTINGS_FILE = SETTINGS_DIR / "huntarr.json"
+SETTINGS_FILE = SETTINGS_DIR / "newtarr.json"
 
 def migrate_settings():
     """Migrate settings from nested to flat structure"""
@@ -35,18 +35,18 @@ def migrate_settings():
         
         # Check and migrate each app's settings
         for app in ["sonarr", "radarr", "lidarr", "readarr"]:
-            if app in settings and "huntarr" in settings[app]:
-                logger.info(f"Found nested huntarr section in {app}, migrating...")
+            if app in settings and "newtarr" in settings[app]:
+                logger.info(f"Found nested newtarr section in {app}, migrating...")
                 
-                # Move all settings from app.huntarr to app level
-                for key, value in settings[app]["huntarr"].items():
+                # Move all settings from app.newtarr to app level
+                for key, value in settings[app]["newtarr"].items():
                     if key not in settings[app]:
                         settings[app][key] = value
-                        logger.info(f"Moved {app}.huntarr.{key} to {app}.{key}")
+                        logger.info(f"Moved {app}.newtarr.{key} to {app}.{key}")
                 
-                # Remove the huntarr section
-                del settings[app]["huntarr"]
-                logger.info(f"Removed {app}.huntarr section")
+                # Remove the newtarr section
+                del settings[app]["newtarr"]
+                logger.info(f"Removed {app}.newtarr section")
                 changes_made = True
             
             # Check for advanced section

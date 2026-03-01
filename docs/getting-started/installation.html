@@ -10,7 +10,7 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-logo">
-            <img src="../images/huntarr-logo.png" alt="NewtArr Logo">
+            <img src="../images/newtarr-logo.png" alt="NewtArr Logo">
             <h2>NewtArr</h2>
         </div>
 
@@ -132,7 +132,7 @@
 
                             <pre><code>version: '3'
 services:
-  huntarr:
+  newtarr:
     image: ghcr.io/jabrown93/newtarr:latest
     container_name: newtarr
     ports:
@@ -162,15 +162,15 @@ services:
 
                             <h4>One-line Installation</h4>
                             <p>Run the following command to install NewtArr:</p>
-                            <pre><code>curl -sSL https://install.huntarr.io | bash</code></pre>
+                            <pre><code>curl -sSL https://install.newtarr.io | bash</code></pre>
 
                             <h4>Advanced Options</h4>
                             <p>For more control over the installation process, you can use these flags:</p>
-                            <pre><code>curl -sSL https://install.huntarr.io | bash -s -- --prefix /opt/huntarr --port 8080</code></pre>
+                            <pre><code>curl -sSL https://install.newtarr.io | bash -s -- --prefix /opt/newtarr --port 8080</code></pre>
 
                             <p>Available options:</p>
                             <ul>
-                                <li><code>--prefix</code>: Installation directory (default: /opt/huntarr)</li>
+                                <li><code>--prefix</code>: Installation directory (default: /opt/newtarr)</li>
                                 <li><code>--port</code>: Web interface port (default: 7575)</li>
                                 <li><code>--no-docker</code>: Install without Docker (native installation)</li>
                                 <li><code>--no-deps</code>: Skip dependency installation</li>
@@ -294,8 +294,8 @@ id $(whoami)</code></pre>
                     <h4>Connectivity problems</h4>
                     <p>If you can't connect to NewtArr after installation:</p>
                     <ul>
-                        <li>Check if the service is running: <code>docker ps | grep huntarr</code></li>
-                        <li>Check the logs: <code>docker logs huntarr</code></li>
+                        <li>Check if the service is running: <code>docker ps | grep newtarr</code></li>
+                        <li>Check the logs: <code>docker logs newtarr</code></li>
                         <li>Ensure your firewall allows traffic on the configured port</li>
                     </ul>
                 </div>

@@ -15,22 +15,22 @@ effort basis. I will do my best to address any issues that arise, but there are 
 
 # Original README from ElfHosted fork follow below
 
-A neutered fork of [Huntarr](https://github.com/plexguide/Huntarr.io) v6.6.3, from simpler times, maintained
+A neutered fork of [NewtArr](https://github.com/plexguide/NewtArr.io) v6.6.3, from simpler times, maintained
 by [ElfHosted](https://store.elfhosted.com).
 
 ## Why this fork?
 
-The original Huntarr project was abandoned under controversial circumstances. The developer introduced telemetry,
+The original NewtArr project was abandoned under controversial circumstances. The developer introduced telemetry,
 obfuscated code, and potential security concerns that led to significant community backlash. For context,
-see [this Reddit thread](https://www.reddit.com/r/selfhosted/comments/1rckopd/huntarr_your_passwords_and_your_entire_arr_stacks/?share_id=uq4GWZe3e0FNKUIXWHiq8).
+see [this Reddit thread](https://www.reddit.com/r/selfhosted/comments/1rckopd/newtarr_your_passwords_and_your_entire_arr_stacks/?share_id=uq4GWZe3e0FNKUIXWHiq8).
 
 NewtArr is based on v6.6.3, the last clean release before the controversial changes. It has been customized for use
 within [ElfHosted](https://store.elfhosted.com), but can be used standalone.
 
 Read the full
-announcement: [Huntarr Ends Its Hunt, NewtArr Takes It Up](https://store.elfhosted.com/blog/2026/02/24/huntarr-ends-its-hunt-newtarr-takes-it-up/)
+announcement: [NewtArr Ends Its Hunt, NewtArr Takes It Up](https://store.elfhosted.com/blog/2026/02/24/newtarr-ends-its-hunt-newtarr-takes-it-up/)
 
-## Huntarr Feature Timeline
+## NewtArr Feature Timeline
 
 Understanding why we forked at v6.6.3:
 
@@ -81,7 +81,7 @@ If you want just the "hunt missing episodes/movies" functionality, the sweet spo
 Avoid 7.x+ — that's where the request system, Plex auth, Prowlarr, and the massive DB layer arrived. And 9.x is a
 completely different application with built-in download clients.
 
-## Changes from upstream Huntarr v6.6.3
+## Changes from upstream NewtArr v6.6.3
 
 - Rebranded to "NewtArr"
 - ElfHosted green color scheme
@@ -148,4 +148,4 @@ codebase.
 
 ## License
 
-This project is a fork of Huntarr.io. See [LICENSE](LICENSE) for details.
+This project is a fork of NewtArr.io. See [LICENSE](LICENSE) for details.

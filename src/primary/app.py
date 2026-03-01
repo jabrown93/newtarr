@@ -53,7 +53,7 @@ def migrate_settings():
     """Migrate settings from nested to flat structure"""
     # Settings file path
     SETTINGS_DIR = pathlib.Path("/config")
-    SETTINGS_FILE = SETTINGS_DIR / "huntarr.json"
+    SETTINGS_FILE = SETTINGS_DIR / "newtarr.json"
     
     if not SETTINGS_FILE.exists():
         logging.info(f"Settings file {SETTINGS_FILE} does not exist, nothing to migrate.")
@@ -69,16 +69,16 @@ def migrate_settings():
         
         # Check and migrate each app's settings
         for app in ["sonarr", "radarr", "lidarr", "readarr"]:
-            if app in settings and "huntarr" in settings[app]:
-                logging.info(f"Found nested huntarr section in {app}, migrating...")
+            if app in settings and "newtarr" in settings[app]:
+                logging.info(f"Found nested newtarr section in {app}, migrating...")
                 
-                # Move all settings from app.huntarr to app level
-                for key, value in settings[app]["huntarr"].items():
+                # Move all settings from app.newtarr to app level
+                for key, value in settings[app]["newtarr"].items():
                     if key not in settings[app]:
                         settings[app][key] = value
                 
-                # Remove the huntarr section
-                del settings[app]["huntarr"]
+                # Remove the newtarr section
+                del settings[app]["newtarr"]
                 changes_made = True
             
             # Check for advanced section
@@ -119,7 +119,7 @@ def migrate_settings():
 
 if __name__ == "__main__":
     configure_logging()
-    logging.info("Starting Huntarr application")
+    logging.info("Starting NewtArr application")
     
     # Migrate settings to flat structure
     migrate_settings()

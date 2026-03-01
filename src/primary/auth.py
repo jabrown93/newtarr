@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Authentication module for Huntarr
+Authentication module for NewtArr
 Handles user creation, verification, and session management
 Including two-factor authentication
 """
@@ -28,7 +28,7 @@ USER_FILE = USER_DIR / "credentials.json"
 
 # Session settings
 SESSION_EXPIRY = 60 * 60 * 24 * 7  # 1 week in seconds
-SESSION_COOKIE_NAME = "huntarr_session"
+SESSION_COOKIE_NAME = "newtarr_session"
 
 # Store active sessions
 active_sessions = {}

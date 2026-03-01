@@ -1,5 +1,5 @@
 /**
- * Settings forms for Huntarr
+ * Settings forms for NewtArr
  * This file handles generating HTML forms for each app's settings
  */
 
@@ -842,7 +842,7 @@ const SettingsForms = {
             <div class="settings-group">
                 <h3>Swaparr (Beta) - Only For Torrent Users</h3>
                 <div class="setting-item">
-                    <p>Swaparr addresses the issue of stalled downloads and I rewrote it to support Huntarr. Visit Swaparr's <a href="https://github.com/ThijmenGThN/swaparr" target="_blank">GitHub</a> for more information and support the developer!</p>
+                    <p>Swaparr addresses the issue of stalled downloads and I rewrote it to support NewtArr. Visit Swaparr's <a href="https://github.com/ThijmenGThN/swaparr" target="_blank">GitHub</a> for more information and support the developer!</p>
                 </div>
             </div>
 
@@ -935,7 +935,7 @@ const SettingsForms = {
             })
             .catch(error => {
                 console.error('Error loading Swaparr status:', error);
-                statusContainer.innerHTML = `<p>Error fetching status: ${HuntarrUtils.escapeHtml(error.message)}</p>`;
+                statusContainer.innerHTML = `<p>Error fetching status: ${NewtArrUtils.escapeHtml(error.message)}</p>`;
             });
 
         // Add event listener for the Reset Strikes button
@@ -954,7 +954,7 @@ const SettingsForms = {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            statusContainer.innerHTML = `<p>Success: ${HuntarrUtils.escapeHtml(data.message)}</p>`;
+                            statusContainer.innerHTML = `<p>Success: ${NewtArrUtils.escapeHtml(data.message)}</p>`;
                             // Reload status after a short delay
                             setTimeout(() => {
                                 fetch('/api/swaparr/status')
@@ -964,7 +964,7 @@ const SettingsForms = {
                                         if (data.statistics && Object.keys(data.statistics).length > 0) {
                                             statusHTML += '<ul>';
                                             for (const [app, stats] of Object.entries(data.statistics)) {
-                                                const esc = HuntarrUtils.escapeHtml;
+                                                const esc = NewtArrUtils.escapeHtml;
                                                 statusHTML += `<li><strong>${esc(app.toUpperCase())}</strong>: `;
                                                 if (stats.error) {
                                                     statusHTML += `Error: ${esc(stats.error)}</li>`;
@@ -980,18 +980,18 @@ const SettingsForms = {
                                     });
                             }, 1000);
                         } else {
-                            statusContainer.innerHTML = `<p>Error: ${HuntarrUtils.escapeHtml(data.message)}</p>`;
+                            statusContainer.innerHTML = `<p>Error: ${NewtArrUtils.escapeHtml(data.message)}</p>`;
                         }
                     })
                     .catch(error => {
-                        statusContainer.innerHTML = `<p>Error resetting strikes: ${HuntarrUtils.escapeHtml(error.message)}</p>`;
+                        statusContainer.innerHTML = `<p>Error resetting strikes: ${NewtArrUtils.escapeHtml(error.message)}</p>`;
                     });
                 }
             });
         } else if (!resetStrikesBtn) {
             console.warn('Could not find #reset_swaparr_strikes to attach listener.');
         } else {
-             console.warn('huntarrUI or huntarrUI.resetStatefulManagement is not available.');
+             console.warn('newtarrUI or newtarrUI.resetStatefulManagement is not available.');
         }
 
         // Add confirmation dialog for local access bypass toggle
@@ -1004,12 +1004,12 @@ const SettingsForms = {
                 const newState = this.checked;
                 
                 // Preview the UI changes immediately, but they'll be reverted if user doesn't save
-                if (typeof huntarrUI !== 'undefined' && typeof huntarrUI.updateUIForLocalAccessBypass === 'function') {
-                    huntarrUI.updateUIForLocalAccessBypass(newState);
+                if (typeof newtarrUI !== 'undefined' && typeof newtarrUI.updateUIForLocalAccessBypass === 'function') {
+                    newtarrUI.updateUIForLocalAccessBypass(newState);
                 }
                 // Also ensure the main app knows settings have changed if the preview runs
-                if (typeof huntarrUI !== 'undefined' && typeof huntarrUI.markSettingsAsChanged === 'function') {
-                     huntarrUI.markSettingsAsChanged();
+                if (typeof newtarrUI !== 'undefined' && typeof newtarrUI.markSettingsAsChanged === 'function') {
+                     newtarrUI.markSettingsAsChanged();
                 }
             });
         }
@@ -1220,7 +1220,7 @@ const SettingsForms = {
                         <input type="checkbox" id="check_for_updates" ${settings.check_for_updates !== false ? 'checked' : ''}>
                         <span class="toggle-slider" style="position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#3d4353; border-radius:20px; transition:0.4s;"></span>
                     </label>
-                    <p class="setting-help" style="margin-left: -3ch !important;">Automatically check for Huntarr updates</p>
+                    <p class="setting-help" style="margin-left: -3ch !important;">Automatically check for NewtArr updates</p>
                 </div>
                 <div class="setting-item">
                     <label for="debug_mode"><span class="info-icon" title="Enable verbose logging for troubleshooting"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Debug Mode:</label>
@@ -1320,7 +1320,7 @@ const SettingsForms = {
                 <div class="setting-item">
                     <label for="log_refresh_interval_seconds"><span class="info-icon" title="Seconds between log display refreshes in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Log Refresh Interval:</label>
                     <input type="number" id="log_refresh_interval_seconds" min="5" value="${settings.log_refresh_interval_seconds !== undefined ? settings.log_refresh_interval_seconds : 30}">
-                    <p class="setting-help" style="margin-left: -3ch !important;">How often Huntarr refreshes logs from apps (seconds)</p>
+                    <p class="setting-help" style="margin-left: -3ch !important;">How often NewtArr refreshes logs from apps (seconds)</p>
                 </div>
             </div>
         `;
@@ -1341,9 +1341,9 @@ const SettingsForms = {
         const createdDateEl = document.getElementById('stateful_initial_state');
         const expiresDateEl = document.getElementById('stateful_expires_date');
 
-        // Skip loading if huntarrUI has already loaded this data to prevent flashing
-        if (window.huntarrUI && window.huntarrUI._cachedStatefulData) {
-            console.log('[SettingsForms] Using existing huntarrUI cached stateful data');
+        // Skip loading if newtarrUI has already loaded this data to prevent flashing
+        if (window.newtarrUI && window.newtarrUI._cachedStatefulData) {
+            console.log('[SettingsForms] Using existing newtarrUI cached stateful data');
             return; // Exit early - main.js already has this covered
         }
         
@@ -1356,7 +1356,7 @@ const SettingsForms = {
         }
 
         // Check if data is already cached in localStorage
-        const cachedStatefulData = localStorage.getItem('huntarr-stateful-data');
+        const cachedStatefulData = localStorage.getItem('newtarr-stateful-data');
         if (cachedStatefulData) {
             try {
                 const parsedData = JSON.parse(cachedStatefulData);
@@ -1401,7 +1401,7 @@ const SettingsForms = {
              })
             .then(data => {
                 // Cache the response with a timestamp for future use
-                localStorage.setItem('huntarr-stateful-data', JSON.stringify({
+                localStorage.setItem('newtarr-stateful-data', JSON.stringify({
                     ...data,
                     timestamp: Date.now()
                 }));
@@ -1425,8 +1425,8 @@ const SettingsForms = {
                 }
                 
                 // Store data for other components to use
-                if (window.huntarrUI) {
-                    window.huntarrUI._cachedStatefulData = data;
+                if (window.newtarrUI) {
+                    window.newtarrUI._cachedStatefulData = data;
                 }
             })
             .catch(error => {
@@ -1473,13 +1473,13 @@ const SettingsForms = {
                 .then(response => response.ok ? response.json() : null)
                 .then(data => {
                     if (data && data.success) {
-                        localStorage.setItem('huntarr-stateful-data', JSON.stringify({
+                        localStorage.setItem('newtarr-stateful-data', JSON.stringify({
                             ...data,
                             timestamp: Date.now()
                         }));
                         
-                        if (window.huntarrUI) {
-                            window.huntarrUI._cachedStatefulData = data;
+                        if (window.newtarrUI) {
+                            window.newtarrUI._cachedStatefulData = data;
                         }
                     }
                 })
@@ -1815,8 +1815,8 @@ const SettingsForms = {
     // Test connection to an *arr API
     testConnection: function(app, url, apiKey, buttonElement) {
         // Temporarily suppress change detection to prevent the unsaved changes dialog
-        if (window.huntarrUI && window.huntarrUI.suppressUnsavedChangesCheck) {
-            window.huntarrUI.suppressUnsavedChangesCheck = true;
+        if (window.newtarrUI && window.newtarrUI.suppressUnsavedChangesCheck) {
+            window.newtarrUI.suppressUnsavedChangesCheck = true;
         }
         
         // Also set a global flag used by the apps module
@@ -1930,8 +1930,8 @@ const SettingsForms = {
     // Helper method to reset unsaved changes suppression flags
     _resetSuppressionFlags: function() {
         // Reset all suppression flags
-        if (window.huntarrUI) {
-            window.huntarrUI.suppressUnsavedChangesCheck = false;
+        if (window.newtarrUI) {
+            window.newtarrUI.suppressUnsavedChangesCheck = false;
         }
         window._suppressUnsavedChangesDialog = false;
     },

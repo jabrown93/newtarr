@@ -1,11 +1,11 @@
 # NewtArr Security Audit
 
 **Audit Date:** 2026-02-24
-**Codebase:** NewtArr (fork of Huntarr v6.6.3)
+**Codebase:** NewtArr (fork of NewtArr v6.6.3)
 **Audited By:** Automated analysis (Claude)
 **Scope:** Full codebase — backend Python, frontend JavaScript/HTML, configuration, and deployment
 
-> **Context:** This audit was performed on the v6.6.3 codebase inherited from the upstream Huntarr project.
+> **Context:** This audit was performed on the v6.6.3 codebase inherited from the upstream NewtArr project.
 > These findings represent **pre-existing issues** in the original code. NewtArr is designed to run behind
 > an SSO proxy (e.g., Authelia, Authentik) in ElfHosted deployments, which mitigates many of the
 > authentication-related findings. Standalone users should review these findings carefully.
@@ -291,7 +291,7 @@
 
 ### I1: Telemetry/Phone-Home Code Removed
 
-The upstream Huntarr telemetry, update-check, and CI integration code has been **successfully removed** in NewtArr. No evidence of outbound data collection, remote code execution, or hidden communication channels was found. This was one of the primary motivations for the fork.
+The upstream NewtArr telemetry, update-check, and CI integration code has been **successfully removed** in NewtArr. No evidence of outbound data collection, remote code execution, or hidden communication channels was found. This was one of the primary motivations for the fork.
 
 ### I2: Two-Factor Authentication Available
 

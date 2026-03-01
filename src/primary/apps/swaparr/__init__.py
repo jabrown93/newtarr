@@ -1,5 +1,5 @@
 """
-Swaparr app module for Huntarr
+Swaparr app module for NewtArr
 Contains functionality for handling stalled downloads in Starr apps
 """
 
