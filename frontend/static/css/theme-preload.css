@@ -1,0 +1,16 @@
+html, body {
+    background-color: #1a1d24;
+    color: #f8f9fa;
+}
+.sidebar {
+    background-color: #121212;
+}
+.top-bar {
+    background-color: #252a34;
+}
+.login-container {
+    background-color: #252a34;
+}
+.login-header {
+    background-color: #121212;
+}

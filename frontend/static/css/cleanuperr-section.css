@@ -1,0 +1,262 @@
+    #cleanuperrSection {
+        padding: 20px;
+        max-width: 100%;
+        display: none;
+    }
+
+    #cleanuperrSection.active {
+        display: block;
+    }
+
+    .cleanuperr-container {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .cleanuperr-info-box {
+        background: linear-gradient(135deg, rgba(28, 36, 54, 0.9), rgba(24, 32, 48, 0.8));
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+        border: 1px solid rgba(90, 109, 137, 0.2);
+    }
+
+    .cleanuperr-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .cleanuperr-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .app-logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .github-info-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin: 15px 0;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        border: 1px solid rgba(90, 109, 137, 0.2);
+    }
+
+    .github-stars {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 16px;
+    }
+
+    .star-icon {
+        color: #f1c40f;
+    }
+
+    .cleanuperr-title {
+        flex: 2;
+    }
+
+    .cleanuperr-title h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 24px;
+        color: #e0e6ed;
+    }
+
+    .github-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: linear-gradient(135deg, #2c3e50, #1a2632);
+        border-radius: 6px;
+        color: #e0e6ed;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(90, 109, 137, 0.3);
+    }
+
+    .github-link:hover {
+        background: linear-gradient(135deg, #34495e, #2c3e50);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .cleanuperr-description {
+        color: #e0e6ed;
+        line-height: 1.6;
+    }
+
+    .cleanuperr-description h4 {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        color: #3498db;
+    }
+
+    .cleanuperr-description ul {
+        margin-left: 20px;
+        margin-bottom: 20px;
+    }
+
+    .cleanuperr-description li {
+        margin-bottom: 8px;
+    }
+
+    .author-section {
+        margin: 30px 0;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        border: 1px solid rgba(90, 109, 137, 0.2);
+    }
+
+    .author-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .author-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #3498db;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .author-details {
+        flex: 1;
+    }
+
+    .author-details h4 {
+        margin-top: 0;
+        color: #3498db;
+    }
+
+    .origin-section {
+        margin: 25px 0;
+        padding: 15px;
+        background: rgba(41, 128, 185, 0.1);
+        border-radius: 8px;
+        border: 1px solid rgba(41, 128, 185, 0.2);
+    }
+
+    .collaboration-note {
+        margin: 30px 0;
+        padding: 15px;
+        background: rgba(52, 152, 219, 0.1);
+        border-left: 4px solid #3498db;
+        border-radius: 0 8px 8px 0;
+    }
+
+    .cleanuperr-cta {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .button, .back-button {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .back-button {
+        background: linear-gradient(135deg, #34495e, #2c3e50);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .back-button:hover {
+        background: linear-gradient(135deg, #3a536b, #34495e);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .header-buttons {
+        margin-right: 20px;
+    }
+
+    .primary-button {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+    }
+
+    .primary-button:hover {
+        background: linear-gradient(135deg, #2980b9, #2471a3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+    }
+
+    .discord-button {
+        background: linear-gradient(135deg, #5865F2, #4752C4);
+        color: white;
+        border: none;
+    }
+
+    .discord-button:hover {
+        background: linear-gradient(135deg, #4752C4, #3C45A5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(88, 101, 242, 0.4);
+    }
+
+    .secondary-button {
+        background: transparent;
+        color: #3498db;
+        border: 1px solid #3498db;
+    }
+
+    .secondary-button:hover {
+        background: rgba(52, 152, 219, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .cleanuperr-header {
+            flex-direction: column;
+        }
+
+        .cleanuperr-logo {
+            width: 100%;
+        }
+
+        .author-info {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .cleanuperr-cta {
+            flex-direction: column;
+        }
+
+        .button {
+            width: 100%;
+        }
+    }

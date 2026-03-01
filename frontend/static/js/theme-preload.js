@@ -10,28 +10,7 @@
     document.documentElement.classList.add('dark-theme');
     localStorage.setItem('newtarr-dark-mode', 'true');
     
-    // Add inline style to immediately set background color
-    // This prevents flash before the CSS files load
-    const style = document.createElement('style');
-    style.textContent = `
-        body, html { 
-            background-color: #1a1d24 !important; 
-            color: #f8f9fa !important;
-        }
-        .sidebar {
-            background-color: #121212 !important;
-        }
-        .top-bar {
-            background-color: #252a34 !important;
-        }
-        .login-container {
-            background-color: #252a34 !important;
-        }
-        .login-header {
-            background-color: #121212 !important;
-        }
-    `;
-    document.head.appendChild(style);
+    // Critical dark styles are in theme-preload.css (loaded before this script)
     
     // Store the logo URL in localStorage for persistence across page loads
     localStorage.setItem('newtarr-logo-url', LOGO_URL);

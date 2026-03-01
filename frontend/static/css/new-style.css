@@ -2451,3 +2451,5 @@ input#stateful_management_hours {
     max-width: 55px !important;
     font-size: 0.9rem;
 }
+
+.initially-hidden { display: none; }
