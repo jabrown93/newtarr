@@ -2,32 +2,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Simplified scrollbar setup for history section - matches logs approach
         const fixHistoryScrolling = function() {
-            // Apply minimal CSS needed for proper table scrolling
-            const style = document.createElement('style');
-            style.id = 'history-scrollbar-fix';
-            style.innerHTML = `
-                /* Ensure the history container allows proper scrolling */
-                .history-container {
-                    overflow: visible !important;
-                }
-
-                /* Ensure the table wrapper has proper scrolling */
-                .modern-table-wrapper {
-                    height: calc(100vh - 200px) !important;
-                    overflow-y: auto !important;
-                    overflow-x: auto !important;
-                }
-
-                /* Prevent text from wrapping in table cells except for the second column */
-                .modern-table td:not(:nth-child(2)), .history-table td:not(:nth-child(2)) {
-                    white-space: nowrap !important;
-                    overflow: hidden !important;
-                    text-overflow: ellipsis !important;
-                }
-            `;
-            document.head.appendChild(style);
-
-            // Keep the table wrapper reference for potential future use
+            // All scrolling CSS rules are in history-section.css - just ensure
+            // the table wrapper doesn't have conflicting inline styles.
             const tableWrapper = document.querySelector('.modern-table-wrapper');
             if (tableWrapper) {
                 // Remove any inline styles that could be interfering
@@ -52,12 +28,6 @@
             if (e.detail.section === 'history') {
                 setTimeout(fixHistoryScrolling, 100);
             } else {
-                // Remove existing style if it exists
-                const existingStyle = document.getElementById('history-scrollbar-fix');
-                if (existingStyle) {
-                    existingStyle.remove();
-                }
-
                 // Force the table wrapper to have a fixed height to ensure scrollbar appears
                 const tableWrapper = document.querySelector('.modern-table-wrapper');
                 if (tableWrapper) {

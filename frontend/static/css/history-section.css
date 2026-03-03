@@ -264,9 +264,9 @@
     /* Modern-table-wrapper for scrollable tables - using the same approach as logs */
     .modern-table-wrapper {
         width: 100%;
-        height: calc(100vh - 200px); /* Same method used in logs section */
-        overflow-y: auto;
-        overflow-x: auto;
+        height: calc(100vh - 200px) !important; /* Same method used in logs section */
+        overflow-y: auto !important;
+        overflow-x: auto !important;
         position: relative;
         border-radius: 8px;
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);

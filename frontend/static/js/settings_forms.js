@@ -1937,30 +1937,4 @@ const SettingsForms = {
     },
 };
 
-// Add CSS for toggle circle
-const styleEl = document.createElement('style');
-styleEl.innerHTML = `
-    .toggle-switch input:checked + .toggle-slider {
-        background-color: #50762E !important;
-    }
-    .toggle-slider:before {
-        position: absolute;
-        content: "";
-        height: 14px;
-        width: 14px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
-    }
-    .toggle-switch input:checked + .toggle-slider:before {
-        transform: translateX(20px);
-    }
-    
-    /* Align setting help text 3 characters to the left */
-    .setting-help {
-        margin-left: -3ch !important;
-    }
-`;
-document.head.appendChild(styleEl);
+// Toggle switch CSS is in settings-section.css

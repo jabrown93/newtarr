@@ -200,8 +200,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                  qrCodeImg.src = twoFactorData.qr_code_url; // Set src directly
                                  qrCodeImg.classList.add('is-visible'); // Ensure it's visible via CSS class
                             } else {
-                                // Fallback if img tag wasn't there initially
-                                qrCodeElement.innerHTML = `<img src="${twoFactorData.qr_code_url}" alt="QR Code" class="qr-code-img is-visible">`;
+                                // Fallback if img tag wasn't there initially - use DOM APIs (CSP-safe)
+                                qrCodeElement.textContent = '';
+                                const createdImg = document.createElement('img');
+                                createdImg.src = twoFactorData.qr_code_url;
+                                createdImg.alt = 'QR Code';
+                                createdImg.className = 'qr-code-img is-visible';
+                                qrCodeElement.appendChild(createdImg);
                             }
                             secretKeyElement.textContent = twoFactorData.secret;
                             showStep(2);
