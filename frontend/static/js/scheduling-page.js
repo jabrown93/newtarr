@@ -5,29 +5,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Apply scrolling fixes immediately and after a delay
             function applyScrollingFixes() {
-                // Fix body and main content scrolling
-                document.body.style.overflow = 'auto';
-                document.documentElement.style.overflow = 'auto';
+                // Fix body and main content scrolling using CSS classes (CSP-safe)
+                document.body.classList.add('scheduling-scroll-body');
+                document.documentElement.classList.add('scheduling-scroll-root');
 
                 const mainContent = document.querySelector('.main-content');
                 if (mainContent) {
-                    mainContent.style.overflowY = 'auto';
-                    mainContent.style.height = 'auto';
+                    mainContent.classList.add('scheduling-scroll-main');
                 }
 
                 const schedulingPage = document.getElementById('schedulingPage');
                 if (schedulingPage) {
-                    schedulingPage.style.overflowY = 'auto';
-                    schedulingPage.style.height = 'auto';
-                    schedulingPage.style.maxHeight = 'none';
+                    schedulingPage.classList.add('scheduling-scroll-page');
                 }
 
                 // Fix all scheduler containers
                 const containers = document.querySelectorAll('.scheduler-container, .scheduler-panel, .panel-content, #schedulesContainer');
                 containers.forEach(container => {
-                    container.style.overflow = 'visible';
-                    container.style.height = 'auto';
-                    container.style.maxHeight = 'none';
+                    container.classList.add('scheduling-scroll-container');
                 });
             }
 
