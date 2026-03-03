@@ -78,7 +78,7 @@ class NewtarrService(win32serviceutil.ServiceFramework):
             self.stop_flag = stop_event
 
             # Configure service environment
-            os.environ['FLASK_HOST'] = '::'
+            os.environ['FLASK_HOST'] = '*'
             os.environ['PORT'] = '9705'
             os.environ['DEBUG'] = 'false'
 
@@ -92,7 +92,7 @@ class NewtarrService(win32serviceutil.ServiceFramework):
 
             # Start the web server in a thread
             web_thread = threading.Thread(
-                target=lambda: serve(app, host='::', port=9705, threads=8),
+                target=lambda: serve(app, host='*', port=9705, threads=8),
                 name="NewtarrWebServer",
                 daemon=True
             )
@@ -125,7 +125,7 @@ class NewtarrService(win32serviceutil.ServiceFramework):
                     if not web_thread.is_alive():
                         logger.info("Attempting to restart web server thread...")
                         web_thread = threading.Thread(
-                            target=lambda: serve(app, host='::', port=9705, threads=8),
+                            target=lambda: serve(app, host='*', port=9705, threads=8),
                             name="NewtarrWebServer",
                             daemon=True
                         )

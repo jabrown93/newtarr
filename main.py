@@ -118,7 +118,7 @@ def run_web_server():
     global _waitress_server
     web_logger = get_logger("WebServer") # Use app's logger
     debug_mode = os.environ.get('DEBUG', 'false').lower() == 'true'
-    host = os.environ.get('FLASK_HOST', '::')
+    host = os.environ.get('FLASK_HOST', '*')
     port = int(os.environ.get('PORT', 9705)) # Use PORT for consistency
 
     web_logger.info(f"Starting web server on {host}:{port} (Debug: {debug_mode})...")

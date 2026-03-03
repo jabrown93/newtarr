@@ -20,7 +20,7 @@ _logger = get_logger("url_validation")
 BLOCKED_RANGES = [
     ipaddress.ip_network("169.254.0.0/16"),   # Link-local / cloud metadata (AWS, GCP, Azure)
     ipaddress.ip_network("127.0.0.0/8"),       # Loopback
-    ipaddress.ip_network("::1/128"),           # IPv6 loopback
+    ipaddress.ip_network("*1/128"),           # IPv6 loopback
     ipaddress.ip_network("fe80::/10"),         # IPv6 link-local
 ]
 

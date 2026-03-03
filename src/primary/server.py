@@ -2,7 +2,7 @@ import logging
 
 # ...existing code...
 
-def start_server(host='::', port=9876, debug=False):
+def start_server(host='*', port=9876, debug=False):
     """Start the web server"""
     logging.basicConfig(level=logging.DEBUG if debug else logging.INFO)
     logger = logging.getLogger(__name__)
