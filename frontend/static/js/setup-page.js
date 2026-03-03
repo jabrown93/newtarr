@@ -324,6 +324,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Always use dark mode
-    document.body.classList.add('dark-mode');
+    document.body.classList.add('dark-theme');
     localStorage.setItem('newtarr-dark-mode', 'true');
 });
