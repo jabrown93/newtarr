@@ -200,7 +200,7 @@ def logs_stream():
 
     # Use a client identifier to track connections
     # Use request.remote_addr directly for client_id
-    client_id = request.remote_addr 
+    client_id = request.remote_addr
     current_time_str = datetime.datetime.now().strftime("%H:%M:%S") # Renamed variable
 
     web_logger.info(f"Starting log stream for app type: {app_type} (client: {client_id}, time: {current_time_str})")
@@ -261,7 +261,7 @@ def logs_stream():
                 if app_log:
                     log_files_to_follow = [(app_type, app_log)]
                     web_logger.debug(f"Following {app_type} log: {app_log}")
-                
+
                 # Also include system log for related messages
                 system_log = KNOWN_LOG_FILES.get('system')
                 if system_log:
@@ -310,7 +310,7 @@ def logs_stream():
                         now = datetime.datetime.now()
                         if name in last_check and (now - last_check[name]).total_seconds() < 0.2:
                             continue
-                        
+
                         last_check[name] = now
 
                         # Check file exists
@@ -349,17 +349,17 @@ def logs_stream():
                                     line = f.readline()
                                     if not line:
                                         break
-                                    
+
                                     # Only filter when reading system log for specific app tab
                                     if app_type != 'all' and app_type != 'system' and name == 'system':
                                         # MODIFIED: Don't include system logs in app tabs at all
                                         include_line = False
                                     else:
                                         include_line = True
-                                    
+
                                     if include_line:
                                         new_lines.append(line)
-                                    
+
                                     lines_read += 1
 
                                 # Process collected lines
@@ -371,14 +371,14 @@ def logs_stream():
                                         if stripped:
                                             prefix = f"[{name.upper()}] " if app_type == 'all' else ""
                                             yield f"data: {prefix}{stripped}\n\n"
-                        
+
                         except FileNotFoundError:
                             web_logger.warning(f"Log file {path} disappeared during read.")
                             positions[name] = -1
                         except Exception as e:
                             web_logger.error(f"Error reading {path}: {e}")
                             yield f"data: ERROR: Problem reading log: {str(e)}\n\n"
-                    
+
                     except Exception as e:
                         web_logger.error(f"Error processing {name}: {e}")
                         yield f"data: ERROR: Unexpected issue with log.\n\n"
@@ -430,16 +430,16 @@ def api_settings():
 def save_general_settings():
     general_logger = get_logger("web_server")
     general_logger.info("Received request to save general settings.")
-    
+
     # Make sure we have data
     if not request.is_json:
         return jsonify({"success": False, "error": "Expected JSON data"}), 400
-    
+
     data = request.json
-    
+
     # Ensure auth_mode and bypass flags are consistent
     auth_mode = data.get('auth_mode')
-    
+
     # If auth_mode is explicitly set, ensure the bypass flags match it
     if auth_mode:
         if auth_mode == 'local_bypass':
@@ -451,10 +451,10 @@ def save_general_settings():
         elif auth_mode == 'login':
             data['local_access_bypass'] = False
             data['proxy_auth_bypass'] = False
-    
+
     # Save general settings
     success = settings_manager.save_settings('general', data)
-    
+
     if success:
         # Update expiration timing from general settings if applicable
         try:
@@ -467,10 +467,10 @@ def save_general_settings():
             pass
         except Exception as e:
             general_logger.error(f"Error updating expiration timing: {e}")
-        
+
         # Update logging levels immediately when general settings are changed
         update_logging_levels()
-        
+
         return jsonify({"success": True})
     else:
         return jsonify({"success": False, "error": "Failed to save general settings"}), 500
@@ -478,24 +478,24 @@ def save_general_settings():
 @app.route('/api/settings/<app_name>', methods=['GET', 'POST'])
 def handle_app_settings(app_name):
     web_logger = get_logger("web_server")
-    
+
     # Validate app_name
     if app_name not in settings_manager.KNOWN_APP_TYPES:
         return jsonify({"success": False, "error": f"Unknown application type: {app_name}"}), 400
-    
+
     if request.method == 'GET':
         # Return settings for the specific app
         app_settings = settings_manager.load_settings(app_name)
         return jsonify(app_settings)
-    
+
     elif request.method == 'POST':
         # Make sure we have data
         if not request.is_json:
             return jsonify({"success": False, "error": "Expected JSON data"}), 400
-        
+
         data = request.json
         web_logger.debug(f"Received {app_name} settings save request: {data}")
-        
+
         # Clean URLs in the data before saving
         if 'instances' in data and isinstance(data['instances'], list):
             for instance in data['instances']:
@@ -505,12 +505,12 @@ def handle_app_settings(app_name):
         elif 'api_url' in data and data['api_url']:
             # For apps that don't use instances array
             data['api_url'] = data['api_url'].strip().rstrip('/').rstrip('\\')
-        
+
         web_logger.debug(f"Cleaned {app_name} settings before saving: {data}")
-        
+
         # Save the app settings
         success = settings_manager.save_settings(app_name, data)
-        
+
         if success:
             web_logger.info(f"Successfully saved {app_name} settings")
             return jsonify({"success": True})
@@ -588,15 +588,15 @@ def api_app_status(app_name):
     web_logger = get_logger("web_server")
     response_data = {"configured": False, "connected": False} # Default for non-Sonarr apps
     status_code = 200
-    
+
     # First validate the app name
     if app_name not in settings_manager.KNOWN_APP_TYPES:
         web_logger.warning(f"Status check requested for invalid app name: {app_name}")
         return jsonify({"configured": False, "connected": False, "error": "Invalid app name"}), 400
-    
+
     try:
         if app_name in ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros']:
-            # --- Multi-Instance Status Check --- # 
+            # --- Multi-Instance Status Check --- #
             connected_count = 0
             total_configured = 0
             try:
@@ -604,13 +604,13 @@ def api_app_status(app_name):
                 module_name = f'src.primary.apps.{app_name}'
                 instances_module = importlib.import_module(module_name)
                 api_module = importlib.import_module(f'{module_name}.api')
-                
+
                 if hasattr(instances_module, 'get_configured_instances'):
                     get_instances_func = getattr(instances_module, 'get_configured_instances')
                     instances = get_instances_func()
                     total_configured = len(instances)
                     api_timeout = settings_manager.get_setting(app_name, "api_timeout", 10) # Get global timeout
-                    
+
                     if total_configured > 0:
                         web_logger.debug(f"Checking connection for {total_configured} {app_name.capitalize()} instances...")
                         if hasattr(api_module, 'check_connection'):
@@ -632,7 +632,7 @@ def api_app_status(app_name):
                             web_logger.warning(f"check_connection function not found in {app_name} API module")
                     else:
                         web_logger.debug(f"No configured {app_name.capitalize()} instances found for status check.")
-                    
+
                     # Prepare multi-instance response
                     response_data = {"total_configured": total_configured, "connected_count": connected_count}
                 else:
@@ -646,7 +646,7 @@ def api_app_status(app_name):
                         check_connection_func = getattr(api_module, 'check_connection')
                         is_connected = check_connection_func(api_url, api_key, min(api_timeout, 5))
                     response_data = {"total_configured": 1 if is_configured else 0, "connected_count": 1 if is_connected else 0}
-                                
+
             except ImportError as e:
                 web_logger.error(f"Failed to import {app_name} modules for status check: {e}")
                 response_data = {"total_configured": 0, "connected_count": 0, "error": "Import Error"}
@@ -655,7 +655,7 @@ def api_app_status(app_name):
                 web_logger.error(f"Error during {app_name} multi-instance status check: {e}", exc_info=True)
                 response_data = {"total_configured": total_configured, "connected_count": connected_count, "error": "Check Error"}
                 status_code = 500
-                
+
         else:
             # --- Legacy/Single Instance Status Check (for other apps) --- #
             api_url = settings_manager.get_api_url(app_name)
@@ -668,7 +668,7 @@ def api_app_status(app_name):
                 try:
                     module_path = f'src.primary.apps.{app_name}.api'
                     api_module = importlib.import_module(module_path)
-                    
+
                     if hasattr(api_module, 'check_connection'):
                         check_connection_func = getattr(api_module, 'check_connection')
                         # Use a short timeout to prevent long waits
@@ -681,12 +681,12 @@ def api_app_status(app_name):
                 except Exception as e:
                     web_logger.error(f"Error checking connection for {app_name}: {str(e)}")
                     is_connected = False # Ensure connection is false on check error
-            
+
             # Prepare legacy response format
             response_data = {"configured": is_configured, "connected": is_connected}
-        
+
         return jsonify(response_data), status_code
-    
+
     except Exception as e:
         web_logger.error(f"Unexpected error in status check for {app_name}: {str(e)}", exc_info=True)
         # Return a valid response even on error to prevent UI issues
@@ -721,10 +721,10 @@ def apply_timezone_setting():
     """Apply timezone setting to the container."""
     # This functionality has been disabled as per user request
     return jsonify({
-        "success": False, 
+        "success": False,
         "message": "Timezone settings have been disabled. This feature may be available in future updates."
     })
-    
+
     # Original implementation commented out
     '''
     data = request.json
@@ -756,13 +756,13 @@ def api_get_stats():
     try:
         # Import the stats manager to get actual stats
         from src.primary.stats_manager import get_stats
-        
+
         # Get real stats from the stats file
         stats = get_stats()
-        
+
         web_logger = get_logger("web_server")
         web_logger.info(f"Serving actual stats from file: {stats}")
-        
+
         return jsonify({"success": True, "stats": stats})
     except Exception as e:
         web_logger = get_logger("web_server")
@@ -775,25 +775,25 @@ def api_reset_stats():
     try:
         data = request.json or {}
         app_type = data.get('app_type')
-        
+
         # Get logger for logging the reset action
         web_logger = get_logger("web_server")
-        
+
         # Import the reset_stats function
         from src.primary.stats_manager import reset_stats
-        
+
         if app_type:
             web_logger.info(f"Resetting statistics for app: {app_type}")
             reset_success = reset_stats(app_type)
         else:
             web_logger.info("Resetting all media statistics")
             reset_success = reset_stats(None)
-        
+
         if reset_success:
             return jsonify({"success": True, "message": "Statistics reset successfully"})
         else:
             return jsonify({"success": False, "error": "Failed to reset statistics"}), 500
-        
+
     except Exception as e:
         web_logger = get_logger("web_server")
         web_logger.error(f"Error resetting statistics: {str(e)}")
@@ -806,22 +806,22 @@ def api_get_hourly_caps():
         # Import necessary functions
         from src.primary.stats_manager import load_hourly_caps
         from src.primary.settings_manager import load_settings
-        
+
         # Get the logger
         web_logger = get_logger("web_server")
-        
+
         # Load the current hourly caps
         caps = load_hourly_caps()
-        
+
         # Get app-specific hourly cap limits
         app_limits = {}
         apps = ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros']
         for app in apps:
             app_settings = load_settings(app)
             app_limits[app] = app_settings.get('hourly_cap', 20)  # Default to 20 if not set
-        
+
         web_logger.debug(f"Serving hourly caps data with app-specific limits: {app_limits}")
-        
+
         return jsonify({
             "success": True,
             "caps": caps,
@@ -859,24 +859,24 @@ def version_txt():
 def reset_app_cycle(app_name):
     """
     Manually trigger a reset of the cycle for a specific app.
-    
+
     Args:
         app_name: The name of the app (sonarr, radarr, lidarr, readarr, etc.)
-    
+
     Returns:
         JSON response with success/error status
     """
     # Make sure to initialize web_logger if it's not available in this scope
     web_logger = get_logger("web_server")
     web_logger.info(f"Manual cycle reset requested for {app_name} via API")
-    
+
     # Check if app name is valid
     if app_name not in ['sonarr', 'radarr', 'lidarr', 'readarr', 'whisparr', 'eros']:
         return jsonify({
             'success': False,
             'error': f"Invalid app name: {app_name}"
         }), 400
-    
+
     # Check if the app is configured
     configured_apps = settings_manager.get_configured_apps()
     if app_name not in configured_apps:
@@ -884,19 +884,19 @@ def reset_app_cycle(app_name):
             'success': False,
             'error': f"{app_name} is not configured"
         }), 400
-        
+
     try:
         # Trigger cycle reset for the app using a file-based approach
         # Ensure reset directory exists
         reset_dir = "/config/reset"
         import os
         os.makedirs(reset_dir, exist_ok=True)
-        
+
         # Create the reset file
         reset_file = os.path.join(reset_dir, f"{app_name}.reset")
         with open(reset_file, 'w') as f:
             f.write(str(int(time.time())))  # Write current timestamp
-        
+
         web_logger.info(f"Created reset file for {app_name} at {reset_file}")
         success = True
     except Exception as e:
@@ -934,7 +934,7 @@ def start_web_server():
     web_logger = get_logger("web_server")
     web_logger.info("--- start_web_server function called ---") # Added log
     debug_mode = os.environ.get('DEBUG', 'false').lower() == 'true'
-    host = '0.0.0.0'  # Listen on all interfaces
+    host = '::'  # Listen on all interfaces
     port = int(os.environ.get('PORT', 9705))
 
     # Ensure the log directory exists

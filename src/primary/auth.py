@@ -55,17 +55,17 @@ def save_user_data(user_data: Dict[str, Any]) -> bool:
         logger.debug(f"Attempting to save user data to: {USER_FILE}")
         # Ensure directory exists (though it should from startup)
         USER_DIR.mkdir(parents=True, exist_ok=True)
-        
+
         with open(USER_FILE, 'w') as f:
             json.dump(user_data, f, indent=4) # Add indent for readability
-        
+
         # Set permissions after writing
         try:
             os.chmod(USER_FILE, 0o600)
             logger.debug(f"Set permissions 0o600 on {USER_FILE}")
         except Exception as e_perm:
             logger.warning(f"Could not set permissions on file {USER_FILE}: {e_perm}")
-            
+
         logger.info(f"User data saved successfully to {USER_FILE}")
         return True
     except Exception as e:
@@ -132,7 +132,7 @@ def validate_password_strength(password: str) -> Optional[str]:
     """
     if len(password) < 8:
         return "Password must be at least 8 characters long."
-    
+
     # If check passes
     return None
 
@@ -145,7 +145,7 @@ def create_user(username: str, password: str) -> bool:
     if not username or not password:
         logger.error("Attempted to create user with empty username or password")
         return False
-        
+
     # Ensure user directory exists with proper permissions
     logger.info(f"Ensuring user directory exists: {USER_DIR}")
     USER_DIR.mkdir(parents=True, exist_ok=True)
@@ -155,11 +155,11 @@ def create_user(username: str, password: str) -> bool:
         os.chmod(USER_DIR, 0o755)
     except Exception as e:
         logger.warning(f"Could not set permissions on directory {USER_DIR}: {e}")
-        
+
     # Hash the username and password
     username_hash = hash_username(username)
     password_hash = hash_password(password)
-    
+
     # Store the credentials
     user_data = {
         "username": username_hash,
@@ -168,7 +168,7 @@ def create_user(username: str, password: str) -> bool:
         "2fa_enabled": False,
         "2fa_secret": None
     }
-    
+
     try:
         logger.info(f"Writing user file: {USER_FILE}")
         with open(USER_FILE, 'w') as f:
@@ -188,21 +188,21 @@ def create_user(username: str, password: str) -> bool:
 def verify_user(username: str, password: str, otp_code: str = None) -> Tuple[bool, bool]:
     """
     Verify user credentials
-    
+
     Returns:
         Tuple[bool, bool]: (auth_success, needs_2fa)
     """
     if not user_exists():
         logger.warning("Login attempt failed: User does not exist.")
         return False, False
-        
+
     try:
         with open(USER_FILE, 'r') as f:
             user_data = json.load(f)
-            
+
         # Hash the provided username
         username_hash = hash_username(username)
-        
+
         # Compare username and verify password
         if user_data.get("username") == username_hash:
             if verify_password(user_data.get("password", ""), password):
@@ -211,7 +211,7 @@ def verify_user(username: str, password: str, otp_code: str = None) -> Tuple[boo
                 logger.debug(f"2FA enabled for user '{username}': {two_fa_enabled}")
                 logger.debug(f"2FA secret present: {bool(user_data.get('2fa_secret'))}")
                 logger.debug(f"OTP code provided: {bool(otp_code)}")
-                
+
                 if two_fa_enabled:
                     # If 2FA code was provided, verify it
                     if otp_code:
@@ -238,7 +238,7 @@ def verify_user(username: str, password: str, otp_code: str = None) -> Tuple[boo
                 return False, False
     except Exception as e:
         logger.error(f"Error during user verification for '{username}': {e}", exc_info=True)
-    
+
     logger.warning(f"Login attempt failed for user '{username}': Username not found or other error.")
     return False, False
 
@@ -246,29 +246,29 @@ def create_session(username: str) -> str:
     """Create a new session for an authenticated user"""
     session_id = secrets.token_hex(32)
     # Store the actual username, not the hash
-    
+
     # Store session data
     active_sessions[session_id] = {
         "username": username, # Store actual username
         "created_at": time.time(),
         "expires_at": time.time() + SESSION_EXPIRY
     }
-    
+
     return session_id
 
 def verify_session(session_id: str) -> bool:
     """Verify if a session is valid"""
     if not session_id or session_id not in active_sessions:
         return False
-        
+
     session_data = active_sessions[session_id]
-    
+
     # Check if session has expired
     if session_data.get("expires_at", 0) < time.time():
         # Clean up expired session
         del active_sessions[session_id]
         return False
-        
+
     # Extend session expiry
     active_sessions[session_id]["expires_at"] = time.time() + SESSION_EXPIRY
     return True
@@ -277,7 +277,7 @@ def get_username_from_session(session_id: str) -> Optional[str]:
     """Get the username from a session"""
     if not session_id or session_id not in active_sessions:
         return None
-    
+
     # Return the stored username
     return active_sessions[session_id].get("username")
 
@@ -334,36 +334,20 @@ def authenticate_request():
         local_access_bypass = general_settings.get("local_access_bypass", False)
     except Exception:
         pass
-    
+
     remote_addr = request.remote_addr
     logger.info(f"Request IP address: {remote_addr}")
-    
+
     if local_access_bypass:
         # Common local network IP ranges
         local_networks = [
             '127.0.0.1',      # localhost
             '::1',            # localhost IPv6
             '10.',            # 10.0.0.0/8
-            '172.16.',        # 172.16.0.0/12
-            '172.17.',
-            '172.18.',
-            '172.19.',
-            '172.20.',
-            '172.21.',
-            '172.22.',
-            '172.23.',
-            '172.24.',
-            '172.25.',
-            '172.26.',
-            '172.27.',
-            '172.28.',
-            '172.29.',
-            '172.30.',
-            '172.31.',
             '192.168.'        # 192.168.0.0/16
         ]
         is_local = False
-        
+
         # Only trust X-Forwarded-For when the direct connection is from a local/trusted IP
         # (i.e., the request is coming through a local reverse proxy)
         forwarded_for = request.headers.get('X-Forwarded-For')
@@ -385,7 +369,7 @@ def authenticate_request():
                     break
         elif forwarded_for and not remote_is_local:
             logger.warning(f"Ignoring X-Forwarded-For header from untrusted source ({remote_addr})")
-        
+
         # Check if direct remote_addr is a local network IP if not already determined
         if not is_local:
             for network in local_networks:
@@ -393,7 +377,7 @@ def authenticate_request():
                     is_local = True
                     logger.info(f"Direct IP {remote_addr} is a local network IP (matches {network})")
                     break
-                    
+
         if is_local:
             logger.info(f"Local network access from {remote_addr} - Authentication bypassed! (Local Bypass Mode)")
             return None
@@ -401,31 +385,31 @@ def authenticate_request():
             logger.warning(f"Access from {remote_addr} is not recognized as local network - Authentication required")
     else:
         logger.info("Local Bypass Mode is DISABLED - Authentication required")
-    
+
     # Check for valid session
     session_id = session.get(SESSION_COOKIE_NAME)
     if session_id and verify_session(session_id):
         return None
-    
+
     # No valid session, redirect to login
     script_root = request.script_root
     login_path = f"{script_root}/login"
     api_path = f"{script_root}/api/"
-    
+
     if request.path != login_path and not request.path.startswith(api_path):
         return redirect(login_path)
-    
+
     # For API calls, return 401 Unauthorized
     if request.path.startswith("/api/"):
         return {"error": "Unauthorized"}, 401
-    
+
     return None
 
 def logout(session_id: str):
     """Log out the current user by invalidating their session"""
     if session_id and session_id in active_sessions:
         del active_sessions[session_id]
-    
+
     # Clear the session cookie in Flask context (if available, otherwise handled by route)
     # session.pop(SESSION_COOKIE_NAME, None) # This might be better handled solely in the route
 
@@ -437,19 +421,19 @@ def is_2fa_enabled(username):
 def generate_2fa_secret(username: str) -> Tuple[str, str]:
     """
     Generate a new 2FA secret and QR code
-    
+
     Returns:
         Tuple[str, str]: (secret, qr_code_data_uri)
     """
     # Generate a random secret
     secret = pyotp.random_base32()
-    
+
     # Create a TOTP object
     totp = pyotp.TOTP(secret)
-    
+
     # Get the provisioning URI - Use the actual username here
     uri = totp.provisioning_uri(name=username, issuer_name="Newtarr")
-    
+
     # Generate QR code
     qr = qrcode.QRCode(
         version=1,
@@ -459,15 +443,15 @@ def generate_2fa_secret(username: str) -> Tuple[str, str]:
     )
     qr.add_data(uri)
     qr.make(fit=True)
-    
+
     try:
         img = qr.make_image(fill_color="black", back_color="white")
-    
+
         # Convert to base64 string
         buffered = io.BytesIO()
         img.save(buffered, format="PNG")
         img_str = base64.b64encode(buffered.getvalue()).decode()
-    
+
         # Store the secret temporarily associated with the user
         user_data = get_user_data()
         user_data["temp_2fa_secret"] = secret
@@ -477,7 +461,7 @@ def generate_2fa_secret(username: str) -> Tuple[str, str]:
         else:
             logger.error(f"Failed to save temporary 2FA secret for user '{username}'.")
             raise Exception("Failed to save user data with temporary 2FA secret.")
-    
+
     except Exception as e:
         logger.error(f"Error generating 2FA QR code for user '{username}': {e}", exc_info=True)
         raise
@@ -486,11 +470,11 @@ def verify_2fa_code(username: str, code: str, enable_on_verify: bool = False) ->
     """Verify a 2FA code against the temporary secret"""
     user_data = get_user_data()
     temp_secret = user_data.get("temp_2fa_secret")
-    
+
     if not temp_secret:
         logger.warning(f"2FA verification attempt for '{username}' failed: No temporary secret found.")
         return False
-    
+
     totp = pyotp.TOTP(temp_secret)
     if totp.verify(code):
         logger.info(f"2FA code verified successfully for user '{username}'.")
@@ -511,7 +495,7 @@ def verify_2fa_code(username: str, code: str, enable_on_verify: bool = False) ->
 def disable_2fa(password: str) -> bool:
     """Disable 2FA for the current user (using only password - kept for potential other uses)"""
     user_data = get_user_data()
-    
+
     # Verify password
     if verify_password(user_data.get("password", ""), password):
         user_data["2fa_enabled"] = False
@@ -529,24 +513,24 @@ def disable_2fa(password: str) -> bool:
 def disable_2fa_with_password_and_otp(username: str, password: str, otp_code: str) -> bool:
     """Disable 2FA for the specified user, requiring both password and OTP code."""
     user_data = get_user_data() # Assuming this gets data for the logged-in user implicitly
-    
+
     # 1. Verify Password
     if not verify_password(user_data.get("password", ""), password):
         logger.warning(f"Failed to disable 2FA for '{username}': Invalid password provided.")
         return False
-        
+
     # 2. Verify OTP Code against permanent secret
     perm_secret = user_data.get("2fa_secret")
     if not user_data.get("2fa_enabled") or not perm_secret:
         logger.error(f"Failed to disable 2FA for '{username}': 2FA is not enabled or secret missing.")
         # Should ideally not happen if called from the correct UI state, but good to check
-        return False 
-        
+        return False
+
     totp = pyotp.TOTP(perm_secret)
     if not totp.verify(otp_code):
         logger.warning(f"Failed to disable 2FA for '{username}': Invalid OTP code provided.")
         return False
-        
+
     # 3. Both verified, proceed to disable
     user_data["2fa_enabled"] = False
     user_data["2fa_secret"] = None
@@ -560,17 +544,17 @@ def disable_2fa_with_password_and_otp(username: str, password: str, otp_code: st
 def change_username(current_username: str, new_username: str, password: str) -> bool:
     """Change the username for the current user"""
     user_data = get_user_data()
-    
+
     # Verify current username and password
     current_username_hash = hash_username(current_username)
     if user_data.get("username") != current_username_hash:
         logger.warning(f"Username change failed: Current username '{current_username}' does not match stored hash.")
         return False
-    
+
     if not verify_password(user_data.get("password", ""), password):
         logger.warning(f"Username change failed for '{current_username}': Invalid password provided.")
         return False
-    
+
     # Update username
     user_data["username"] = hash_username(new_username)
     if save_user_data(user_data):
@@ -583,12 +567,12 @@ def change_username(current_username: str, new_username: str, password: str) -> 
 def change_password(current_password: str, new_password: str) -> bool:
     """Change the password for the current user"""
     user_data = get_user_data()
-    
+
     # Verify current password
     if not verify_password(user_data.get("password", ""), current_password):
         logger.warning("Password change failed: Invalid current password provided.")
         return False
-    
+
     # Update password
     user_data["password"] = hash_password(new_password)
     if save_user_data(user_data):
@@ -601,10 +585,10 @@ def change_password(current_password: str, new_password: str) -> bool:
 def get_app_url_and_key(app_type: str) -> Tuple[str, str]:
     """
     Get the API URL and API key for a specific app type
-    
+
     Args:
         app_type: The app type (sonarr, radarr, lidarr, readarr)
-    
+
     Returns:
         Tuple[str, str]: (api_url, api_key)
     """

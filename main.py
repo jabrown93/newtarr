@@ -87,7 +87,7 @@ try:
     import logging
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
     from primary.utils.logger import setup_main_logger, get_logger
-    
+
     # Initialize main logger
     newtarr_logger = setup_main_logger()
     newtarr_logger.info("Successfully imported application components.")
@@ -118,7 +118,7 @@ def run_web_server():
     global _waitress_server
     web_logger = get_logger("WebServer") # Use app's logger
     debug_mode = os.environ.get('DEBUG', 'false').lower() == 'true'
-    host = os.environ.get('FLASK_HOST', '0.0.0.0')
+    host = os.environ.get('FLASK_HOST', '::')
     port = int(os.environ.get('PORT', 9705)) # Use PORT for consistency
 
     web_logger.info(f"Starting web server on {host}:{port} (Debug: {debug_mode})...")

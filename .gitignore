@@ -228,3 +228,4 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+newtarr-config/
