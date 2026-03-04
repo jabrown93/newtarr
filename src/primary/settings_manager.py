@@ -32,6 +32,90 @@ KNOWN_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", 
 settings_cache = {}  # Format: {app_name: {'timestamp': timestamp, 'data': settings_dict}}
 CACHE_TTL = 5  # Cache time-to-live in seconds
 
+# Apps that support instance env var overrides (excludes "general")
+_INSTANCE_APP_TYPES = [a for a in KNOWN_APP_TYPES if a != "general"]
+
+
+def _collect_env_instances(app_type: str) -> list:
+    """Scan env vars for instance configs for the given app type.
+
+    Returns a list of instance dicts (index-ordered) found in env vars,
+    or an empty list if no env vars are set for this app.
+
+    Naming convention:
+      {APP}_API_KEY        -> index 0 (default instance)
+      {APP}_1_API_KEY      -> index 1 (second instance)
+      {APP}_2_API_KEY      -> index 2, etc.
+    """
+    prefix = app_type.upper()
+    field_map = {
+        "API_KEY": "api_key",
+        "API_URL": "api_url",
+        "NAME": "name",
+        "ENABLED": "enabled",
+    }
+
+    instances_by_index = {}
+
+    for env_key, env_value in os.environ.items():
+        if not env_key.startswith(prefix + "_"):
+            continue
+        remainder = env_key[len(prefix) + 1:]  # e.g. "API_KEY" or "1_API_KEY"
+
+        parts = remainder.split("_", 1)
+        if parts[0].isdigit() and len(parts) > 1:
+            index = int(parts[0])
+            field_key = parts[1]
+        else:
+            index = 0
+            field_key = remainder
+
+        if field_key in field_map:
+            if index not in instances_by_index:
+                instances_by_index[index] = {}
+            setting_key = field_map[field_key]
+            if setting_key == "enabled":
+                instances_by_index[index][setting_key] = env_value.lower() in ("true", "1", "yes")
+            else:
+                instances_by_index[index][setting_key] = env_value
+
+    if not instances_by_index:
+        return []
+
+    result = []
+    for idx in sorted(instances_by_index.keys()):
+        inst = instances_by_index[idx]
+        inst.setdefault("name", f"Env-{idx}" if idx > 0 else "Default")
+        inst.setdefault("enabled", True)
+        result.append(inst)
+
+    return result
+
+
+def _apply_env_overrides(app_type: str, settings: dict) -> dict:
+    """Override instance settings with values from environment variables."""
+    if app_type not in _INSTANCE_APP_TYPES:
+        return settings
+
+    env_instances = _collect_env_instances(app_type)
+    if not env_instances:
+        return settings
+
+    if "instances" not in settings or not isinstance(settings["instances"], list):
+        settings["instances"] = []
+
+    for i, env_inst in enumerate(env_instances):
+        if i < len(settings["instances"]):
+            settings["instances"][i].update(env_inst)
+        else:
+            settings["instances"].append(env_inst)
+
+    settings_logger.info(
+        f"Applied env var overrides for {app_type}: {len(env_instances)} instance(s)"
+    )
+    return settings
+
+
 def clear_cache(app_name=None):
     """Clear the settings cache for a specific app or all apps."""
     global settings_cache
@@ -140,7 +224,10 @@ def load_settings(app_type, use_cache=True):
             if updated:
                 settings_logger.info(f"Added missing default keys to {app_type}.json")
                 save_settings(app_type, current_settings) # Use save_settings to handle writing
-            
+
+            # Apply environment variable overrides
+            current_settings = _apply_env_overrides(app_type, current_settings)
+
             # Update cache
             settings_cache[app_type] = {
                 'timestamp': time.time(),
@@ -154,7 +241,10 @@ def load_settings(app_type, use_cache=True):
         # Attempt to restore from default
         default_settings = load_default_app_settings(app_type)
         save_settings(app_type, default_settings) # Save the restored defaults
-        
+
+        # Apply environment variable overrides
+        default_settings = _apply_env_overrides(app_type, default_settings)
+
         # Update cache with defaults
         settings_cache[app_type] = {
             'timestamp': time.time(),
