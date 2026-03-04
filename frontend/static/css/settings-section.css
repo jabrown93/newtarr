@@ -87,6 +87,17 @@
     transform: translateX(20px);
 }
 
+/* Env var warning banner */
+.env-warning-banner {
+    background-color: var(--warning-color, #f39c12);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
 /* Align setting help text */
 .setting-help {
     margin-left: -3ch !important;

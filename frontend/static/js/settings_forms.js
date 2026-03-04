@@ -40,6 +40,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="sonarr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="sonarr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Sonarr instance">
@@ -147,6 +148,7 @@ const SettingsForms = {
 
         // Setup instance management (add/remove/test)
         SettingsForms.setupInstanceManagement(container, 'sonarr', settings.instances.length);
+        SettingsForms._applyEnvManagedState(container);
     },
     
     // Generate Radarr settings form
@@ -185,6 +187,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="radarr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="radarr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Radarr instance">
@@ -284,7 +287,8 @@ const SettingsForms = {
         
         // Add event listeners for the instance management
         SettingsForms.setupInstanceManagement(container, 'radarr', settings.instances.length);
-        
+        SettingsForms._applyEnvManagedState(container);
+
         // Set up event listeners for the skip_future_releases checkbox
         const skipFutureCheckbox = container.querySelector('#radarr_skip_future_releases');
         const releaseTypeContainer = container.querySelector('#future_release_type_container');
@@ -336,6 +340,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="lidarr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="lidarr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Lidarr instance">
@@ -434,6 +439,7 @@ const SettingsForms = {
 
         // Add event listeners for the instance management
         SettingsForms.setupInstanceManagement(container, 'lidarr', settings.instances.length);
+        SettingsForms._applyEnvManagedState(container);
     },
     
     // Generate Readarr settings form
@@ -472,6 +478,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="readarr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="readarr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Readarr instance">
@@ -561,6 +568,7 @@ const SettingsForms = {
 
         // Add event listeners for the instance management
         SettingsForms.setupInstanceManagement(container, 'readarr', settings.instances.length);
+        SettingsForms._applyEnvManagedState(container);
     },
     
     // Generate Whisparr settings form
@@ -599,6 +607,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="whisparr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="whisparr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Whisparr V2 instance">
@@ -689,7 +698,8 @@ const SettingsForms = {
 
         // Add event listeners for the instance management
         this.setupInstanceManagement(container, 'whisparr', settings.instances.length);
-        
+        this._applyEnvManagedState(container);
+
         // Update duration display
         this.updateDurationDisplay();
     },
@@ -730,6 +740,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="eros-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="eros-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Whisparr V3 instance">
@@ -828,7 +839,8 @@ const SettingsForms = {
 
         // Add event listeners for the instance management
         this.setupInstanceManagement(container, 'eros', settings.instances.length);
-        
+        this._applyEnvManagedState(container);
+
         // Update duration display
         this.updateDurationDisplay();
     },
@@ -1031,6 +1043,35 @@ const SettingsForms = {
         return date.toLocaleString('en-US', options);
     },
     
+    /**
+     * Generate the env-managed warning banner HTML for an instance.
+     * Returns empty string if the instance is not env-managed.
+     */
+    _envBannerHtml: function(instance, index) {
+        if (index !== 0 || !instance.env_managed) return '';
+        return '<div class="env-warning-banner">This instance is configured via environment variables. Fields below are read-only.</div>';
+    },
+
+    /**
+     * Return 'disabled' attribute string if instance is env-managed (index 0 only).
+     */
+    _envDisabled: function(instance, index) {
+        return (index === 0 && instance.env_managed) ? 'disabled' : '';
+    },
+
+    /**
+     * After form generation, apply disabled state to env-managed instance inputs.
+     */
+    _applyEnvManagedState: function(container) {
+        const firstInstance = container.querySelector('.instance-item[data-instance-id="0"]');
+        if (!firstInstance || !firstInstance.querySelector('.env-warning-banner')) return;
+
+        // Disable connection fields
+        firstInstance.querySelectorAll('input[name="name"], input[name="api_url"], input[name="api_key"], input[name="enabled"]').forEach(input => {
+            input.disabled = true;
+        });
+    },
+
     // Get settings from form
     getFormSettings: function(container, appType) {
         let settings = {};
@@ -1116,7 +1157,12 @@ const SettingsForms = {
                     api_key: key || "",
                     enabled: enabled
                 };
-                
+
+                // Preserve env_managed flag so backend can strip env fields on save
+                if (instance.querySelector('.env-warning-banner')) {
+                    instanceObj.env_managed = true;
+                }
+
                 instances.push(instanceObj);
             });
             

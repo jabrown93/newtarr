@@ -502,6 +502,14 @@ def handle_app_settings(app_name):
                 if 'api_url' in instance and instance['api_url']:
                     # Remove trailing slashes and special characters
                     instance['api_url'] = instance['api_url'].strip().rstrip('/').rstrip('\\')
+
+            # Strip env-managed fields from instances[0] so env var values
+            # are never persisted to the JSON file
+            if len(data['instances']) > 0 and data['instances'][0].get('env_managed'):
+                env_inst = data['instances'][0]
+                for field in ('api_key', 'api_url', 'name', 'enabled', 'env_managed'):
+                    env_inst.pop(field, None)
+                web_logger.debug(f"Stripped env-managed fields from {app_name} instance 0")
         elif 'api_url' in data and data['api_url']:
             # For apps that don't use instances array
             data['api_url'] = data['api_url'].strip().rstrip('/').rstrip('\\')

@@ -36,16 +36,13 @@ CACHE_TTL = 5  # Cache time-to-live in seconds
 _INSTANCE_APP_TYPES = [a for a in KNOWN_APP_TYPES if a != "general"]
 
 
-def _collect_env_instances(app_type: str) -> list:
-    """Scan env vars for instance configs for the given app type.
+def _collect_env_instance(app_type: str) -> Optional[dict]:
+    """Scan env vars for a single instance config for the given app type.
 
-    Returns a list of instance dicts (index-ordered) found in env vars,
-    or an empty list if no env vars are set for this app.
+    Returns an instance dict if any env vars are set, or None otherwise.
 
-    Naming convention:
-      {APP}_API_KEY        -> index 0 (default instance)
-      {APP}_1_API_KEY      -> index 1 (second instance)
-      {APP}_2_API_KEY      -> index 2, etc.
+    Supported env vars:
+      {APP}_API_KEY, {APP}_API_URL, {APP}_NAME, {APP}_ENABLED
     """
     prefix = app_type.upper()
     field_map = {
@@ -55,63 +52,59 @@ def _collect_env_instances(app_type: str) -> list:
         "ENABLED": "enabled",
     }
 
-    instances_by_index = {}
+    instance = {}
 
-    for env_key, env_value in os.environ.items():
-        if not env_key.startswith(prefix + "_"):
-            continue
-        remainder = env_key[len(prefix) + 1:]  # e.g. "API_KEY" or "1_API_KEY"
-
-        parts = remainder.split("_", 1)
-        if parts[0].isdigit() and len(parts) > 1:
-            index = int(parts[0])
-            field_key = parts[1]
-        else:
-            index = 0
-            field_key = remainder
-
-        if field_key in field_map:
-            if index not in instances_by_index:
-                instances_by_index[index] = {}
-            setting_key = field_map[field_key]
-            if setting_key == "enabled":
-                instances_by_index[index][setting_key] = env_value.lower() in ("true", "1", "yes")
+    for field_env, field_setting in field_map.items():
+        env_key = f"{prefix}_{field_env}"
+        env_value = os.environ.get(env_key)
+        if env_value is not None:
+            if field_setting == "enabled":
+                instance[field_setting] = env_value.lower() in ("true", "1", "yes")
             else:
-                instances_by_index[index][setting_key] = env_value
+                instance[field_setting] = env_value
 
-    if not instances_by_index:
-        return []
+    if not instance:
+        return None
 
-    result = []
-    for idx in sorted(instances_by_index.keys()):
-        inst = instances_by_index[idx]
-        inst.setdefault("name", f"Env-{idx}" if idx > 0 else "Default")
-        inst.setdefault("enabled", True)
-        result.append(inst)
+    # Warn if partially configured
+    has_key = "api_key" in instance
+    has_url = "api_url" in instance
+    if has_key != has_url:
+        missing = "API_URL" if has_key else "API_KEY"
+        settings_logger.warning(
+            f"Incomplete env var config for {app_type}: "
+            f"{prefix}_{missing} is not set"
+        )
 
-    return result
+    instance.setdefault("name", "Default")
+    instance.setdefault("enabled", True)
+    return instance
 
 
 def _apply_env_overrides(app_type: str, settings: dict) -> dict:
-    """Override instance settings with values from environment variables."""
+    """Override instance settings with values from environment variables.
+
+    Always overrides instances[0] and sets env_managed=true on it.
+    """
     if app_type not in _INSTANCE_APP_TYPES:
         return settings
 
-    env_instances = _collect_env_instances(app_type)
-    if not env_instances:
+    env_instance = _collect_env_instance(app_type)
+    if env_instance is None:
         return settings
 
     if "instances" not in settings or not isinstance(settings["instances"], list):
         settings["instances"] = []
 
-    for i, env_inst in enumerate(env_instances):
-        if i < len(settings["instances"]):
-            settings["instances"][i].update(env_inst)
-        else:
-            settings["instances"].append(env_inst)
+    if len(settings["instances"]) > 0:
+        settings["instances"][0].update(env_instance)
+    else:
+        settings["instances"].append(env_instance)
+
+    settings["instances"][0]["env_managed"] = True
 
     settings_logger.info(
-        f"Applied env var overrides for {app_type}: {len(env_instances)} instance(s)"
+        f"Applied env var overrides for {app_type} instance 0"
     )
     return settings
 
