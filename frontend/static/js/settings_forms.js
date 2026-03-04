@@ -53,7 +53,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="sonarr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="sonarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Sonarr">
+                            <input type="password" id="sonarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Sonarr">
                             <p class="setting-help">API key for Sonarr</p>
                         </div>
                         <div class="setting-item">
@@ -200,7 +200,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="radarr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="radarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Radarr">
+                            <input type="password" id="radarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Radarr">
                             <p class="setting-help">API key for Radarr</p>
                         </div>
                         <div class="setting-item">
@@ -353,7 +353,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="lidarr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="lidarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Lidarr">
+                            <input type="password" id="lidarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Lidarr">
                             <p class="setting-help">API key for Lidarr</p>
                         </div>
                         <div class="setting-item">
@@ -491,7 +491,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="readarr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="readarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Readarr">
+                            <input type="password" id="readarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Readarr">
                             <p class="setting-help">API key for Readarr</p>
                         </div>
                         <div class="setting-item">
@@ -620,7 +620,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="whisparr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="whisparr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Whisparr V2">
+                            <input type="password" id="whisparr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Whisparr V2">
                             <p class="setting-help">API key for Whisparr V2</p>
                         </div>
                         <div class="setting-item">
@@ -753,7 +753,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="eros-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="eros-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Whisparr V3">
+                            <input type="password" id="eros-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Whisparr V3">
                             <p class="setting-help">API key for Whisparr V3</p>
                         </div>
                         <div class="setting-item">
@@ -1622,6 +1622,9 @@ const SettingsForms = {
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
                 button.disabled = true;
                 
+                // Include instance index so backend can resolve masked keys
+                const instanceIndex = parseInt(instancePanel.dataset.instanceId || '0', 10);
+
                 // Make the API request
                 fetch(`/api/${appType}/test-connection`, {
                     method: 'POST',
@@ -1630,7 +1633,8 @@ const SettingsForms = {
                     },
                     body: JSON.stringify({
                         api_url: url,
-                        api_key: apiKey
+                        api_key: apiKey,
+                        instance_index: instanceIndex
                     })
                 })
                 .then(response => {
@@ -1758,7 +1762,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="${appType}-key-${currentCount}">API Key:</label>
-                            <input type="text" id="${appType}-key-${currentCount}" name="api_key" value="" placeholder="API key">
+                            <input type="password" id="${appType}-key-${currentCount}" name="api_key" value="" placeholder="API key">
                              <p class="setting-help">API key for ${appType}</p>
                         </div>
                         <div class="setting-item">

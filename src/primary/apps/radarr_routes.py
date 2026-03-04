@@ -6,7 +6,7 @@ from src.primary import keys_manager
 from src.primary.state import get_state_file_path, reset_state_file
 from src.primary.utils.logger import get_logger
 from src.primary.utils.url_validation import validate_url, make_validated_request
-from src.primary.settings_manager import get_ssl_verify_setting
+from src.primary.settings_manager import get_ssl_verify_setting, resolve_api_key
 import traceback
 from urllib.parse import urlparse
 
@@ -24,10 +24,13 @@ def test_connection():
     api_url = data.get('api_url')
     api_key = data.get('api_key')
     api_timeout = data.get('api_timeout', 30)  # Use longer timeout for connection test
-    
+
     if not api_url or not api_key:
         return jsonify({"success": False, "message": "API URL and API Key are required"}), 400
-        
+
+    # Resolve masked API key from stored settings
+    api_key = resolve_api_key('radarr', api_key, data.get('instance_index', 0))
+
     radarr_logger.info(f"Testing connection to Radarr API at {api_url}")
     
     # Validate URL format

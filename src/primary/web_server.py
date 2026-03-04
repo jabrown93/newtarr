@@ -422,9 +422,13 @@ def logs_stream():
 @app.route('/api/settings', methods=['GET'])
 def api_settings():
     if request.method == 'GET':
-        # Return all settings using the new manager function
-        all_settings = settings_manager.get_all_settings() # Corrected function name
-        return jsonify(all_settings)
+        # Return all settings with API keys redacted
+        all_settings = settings_manager.get_all_settings()
+        redacted = {
+            app: settings_manager.redact_settings(s)
+            for app, s in all_settings.items()
+        }
+        return jsonify(redacted)
 
 @app.route('/api/settings/general', methods=['POST'])
 def save_general_settings():
@@ -484,9 +488,9 @@ def handle_app_settings(app_name):
         return jsonify({"success": False, "error": f"Unknown application type: {app_name}"}), 400
 
     if request.method == 'GET':
-        # Return settings for the specific app
+        # Return settings with API keys redacted
         app_settings = settings_manager.load_settings(app_name)
-        return jsonify(app_settings)
+        return jsonify(settings_manager.redact_settings(app_settings))
 
     elif request.method == 'POST':
         # Make sure we have data
@@ -494,14 +498,25 @@ def handle_app_settings(app_name):
             return jsonify({"success": False, "error": "Expected JSON data"}), 400
 
         data = request.json
-        web_logger.debug(f"Received {app_name} settings save request: {data}")
+        web_logger.debug(f"Received {app_name} settings save request")
 
-        # Clean URLs in the data before saving
+        # Load existing settings to restore masked API keys
+        existing_settings = settings_manager.load_settings(app_name)
+
+        # Clean URLs and restore masked API keys before saving
         if 'instances' in data and isinstance(data['instances'], list):
-            for instance in data['instances']:
+            existing_instances = existing_settings.get('instances', [])
+
+            for i, instance in enumerate(data['instances']):
                 if 'api_url' in instance and instance['api_url']:
-                    # Remove trailing slashes and special characters
                     instance['api_url'] = instance['api_url'].strip().rstrip('/').rstrip('\\')
+
+                # If the API key is masked, restore the real key from stored settings
+                if settings_manager.is_masked_key(instance.get('api_key', '')):
+                    if i < len(existing_instances):
+                        instance['api_key'] = existing_instances[i].get('api_key', '')
+                    else:
+                        instance['api_key'] = ''
 
             # Strip env-managed fields from instances[0] so env var values
             # are never persisted to the JSON file
@@ -510,11 +525,14 @@ def handle_app_settings(app_name):
                 for field in ('api_key', 'api_url', 'name', 'enabled', 'env_managed'):
                     env_inst.pop(field, None)
                 web_logger.debug(f"Stripped env-managed fields from {app_name} instance 0")
-        elif 'api_url' in data and data['api_url']:
-            # For apps that don't use instances array
-            data['api_url'] = data['api_url'].strip().rstrip('/').rstrip('\\')
+        else:
+            if 'api_url' in data and data['api_url']:
+                data['api_url'] = data['api_url'].strip().rstrip('/').rstrip('\\')
+            # Restore masked legacy api_key
+            if settings_manager.is_masked_key(data.get('api_key', '')):
+                data['api_key'] = existing_settings.get('api_key', '')
 
-        web_logger.debug(f"Cleaned {app_name} settings before saving: {data}")
+        web_logger.debug(f"Cleaned {app_name} settings before saving")
 
         # Save the app settings
         success = settings_manager.save_settings(app_name, data)
@@ -571,13 +589,7 @@ def api_app_settings():
     # Get API credentials using the updated settings_manager function
     api_url = settings_manager.get_api_url(app_type)
     api_key = settings_manager.get_api_key(app_type)
-    # Mask API key for frontend display - actual API calls are made server-side
-    masked_key = ""
-    if api_key:
-        if len(api_key) > 8:
-            masked_key = api_key[:4] + "****" + api_key[-4:]
-        else:
-            masked_key = "****"
+    masked_key = settings_manager.mask_api_key(api_key) if api_key else ""
     api_details = {"api_url": api_url, "api_key": masked_key}
     return jsonify({"success": True, **api_details})
 

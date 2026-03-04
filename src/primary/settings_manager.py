@@ -35,6 +35,61 @@ CACHE_TTL = 5  # Cache time-to-live in seconds
 # Apps that support instance env var overrides (excludes "general")
 _INSTANCE_APP_TYPES = [a for a in KNOWN_APP_TYPES if a != "general"]
 
+# Sentinel prefix used when masking API keys for frontend responses
+_API_KEY_MASK_PREFIX = "****"
+
+
+def mask_api_key(key: str) -> str:
+    """Mask an API key for safe display, showing only the last 4 characters."""
+    if not key:
+        return ""
+    if len(key) > 4:
+        return _API_KEY_MASK_PREFIX + key[-4:]
+    return _API_KEY_MASK_PREFIX
+
+
+def is_masked_key(key: str) -> bool:
+    """Check if a key value is a masked placeholder rather than a real key."""
+    if not key:
+        return False
+    return key.startswith(_API_KEY_MASK_PREFIX)
+
+
+def redact_settings(settings: dict) -> dict:
+    """Return a copy of settings with API keys masked for frontend responses."""
+    import copy
+    redacted = copy.deepcopy(settings)
+
+    # Mask top-level api_key (legacy single-instance)
+    if "api_key" in redacted and redacted["api_key"]:
+        redacted["api_key"] = mask_api_key(redacted["api_key"])
+
+    # Mask api_key in each instance
+    if "instances" in redacted and isinstance(redacted["instances"], list):
+        for inst in redacted["instances"]:
+            if inst.get("api_key"):
+                inst["api_key"] = mask_api_key(inst["api_key"])
+
+    return redacted
+
+
+def resolve_api_key(app_type: str, api_key: str, instance_index: int = 0) -> str:
+    """Resolve an API key that may be masked back to the real stored key.
+
+    If the key is not masked, returns it as-is. Otherwise looks up the
+    real key from stored settings at the given instance index.
+    """
+    if not is_masked_key(api_key):
+        return api_key
+
+    settings = load_settings(app_type)
+    instances = settings.get("instances", [])
+    if instance_index < len(instances):
+        return instances[instance_index].get("api_key", "")
+
+    # Fallback to legacy top-level key
+    return settings.get("api_key", "")
+
 
 def _collect_env_instance(app_type: str) -> Optional[dict]:
     """Scan env vars for a single instance config for the given app type.
