@@ -40,6 +40,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="sonarr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="sonarr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Sonarr instance">
@@ -52,7 +53,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="sonarr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="sonarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Sonarr">
+                            <input type="password" id="sonarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Sonarr">
                             <p class="setting-help">API key for Sonarr</p>
                         </div>
                         <div class="setting-item">
@@ -147,6 +148,7 @@ const SettingsForms = {
 
         // Setup instance management (add/remove/test)
         SettingsForms.setupInstanceManagement(container, 'sonarr', settings.instances.length);
+        SettingsForms._applyEnvManagedState(container);
     },
     
     // Generate Radarr settings form
@@ -185,6 +187,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="radarr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="radarr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Radarr instance">
@@ -197,7 +200,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="radarr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="radarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Radarr">
+                            <input type="password" id="radarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Radarr">
                             <p class="setting-help">API key for Radarr</p>
                         </div>
                         <div class="setting-item">
@@ -284,7 +287,8 @@ const SettingsForms = {
         
         // Add event listeners for the instance management
         SettingsForms.setupInstanceManagement(container, 'radarr', settings.instances.length);
-        
+        SettingsForms._applyEnvManagedState(container);
+
         // Set up event listeners for the skip_future_releases checkbox
         const skipFutureCheckbox = container.querySelector('#radarr_skip_future_releases');
         const releaseTypeContainer = container.querySelector('#future_release_type_container');
@@ -336,6 +340,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="lidarr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="lidarr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Lidarr instance">
@@ -348,7 +353,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="lidarr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="lidarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Lidarr">
+                            <input type="password" id="lidarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Lidarr">
                             <p class="setting-help">API key for Lidarr</p>
                         </div>
                         <div class="setting-item">
@@ -434,6 +439,7 @@ const SettingsForms = {
 
         // Add event listeners for the instance management
         SettingsForms.setupInstanceManagement(container, 'lidarr', settings.instances.length);
+        SettingsForms._applyEnvManagedState(container);
     },
     
     // Generate Readarr settings form
@@ -472,6 +478,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="readarr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="readarr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Readarr instance">
@@ -484,7 +491,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="readarr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="readarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Readarr">
+                            <input type="password" id="readarr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Readarr">
                             <p class="setting-help">API key for Readarr</p>
                         </div>
                         <div class="setting-item">
@@ -561,6 +568,7 @@ const SettingsForms = {
 
         // Add event listeners for the instance management
         SettingsForms.setupInstanceManagement(container, 'readarr', settings.instances.length);
+        SettingsForms._applyEnvManagedState(container);
     },
     
     // Generate Whisparr settings form
@@ -599,6 +607,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="whisparr-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="whisparr-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Whisparr V2 instance">
@@ -611,7 +620,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="whisparr-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="whisparr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Whisparr V2">
+                            <input type="password" id="whisparr-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Whisparr V2">
                             <p class="setting-help">API key for Whisparr V2</p>
                         </div>
                         <div class="setting-item">
@@ -689,7 +698,8 @@ const SettingsForms = {
 
         // Add event listeners for the instance management
         this.setupInstanceManagement(container, 'whisparr', settings.instances.length);
-        
+        this._applyEnvManagedState(container);
+
         // Update duration display
         this.updateDurationDisplay();
     },
@@ -730,6 +740,7 @@ const SettingsForms = {
                         </div>
                     </div>
                     <div class="instance-content">
+                        ${SettingsForms._envBannerHtml(instance, index)}
                         <div class="setting-item">
                             <label for="eros-name-${index}"><span class="info-icon" title="A friendly label to identify this instance in the UI"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;Name:</label>
                             <input type="text" id="eros-name-${index}" name="name" value="${instance.name || ''}" placeholder="Friendly name for this Whisparr V3 instance">
@@ -742,7 +753,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="eros-key-${index}"><span class="info-icon" title="Found in your *arr app under Settings > General > API Key"><i class="fas fa-info-circle"></i></span>&nbsp;&nbsp;&nbsp;API Key:</label>
-                            <input type="text" id="eros-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Whisparr V3">
+                            <input type="password" id="eros-key-${index}" name="api_key" value="${instance.api_key || ''}" placeholder="API key for Whisparr V3">
                             <p class="setting-help">API key for Whisparr V3</p>
                         </div>
                         <div class="setting-item">
@@ -828,7 +839,8 @@ const SettingsForms = {
 
         // Add event listeners for the instance management
         this.setupInstanceManagement(container, 'eros', settings.instances.length);
-        
+        this._applyEnvManagedState(container);
+
         // Update duration display
         this.updateDurationDisplay();
     },
@@ -1031,6 +1043,35 @@ const SettingsForms = {
         return date.toLocaleString('en-US', options);
     },
     
+    /**
+     * Generate the env-managed warning banner HTML for an instance.
+     * Returns empty string if the instance is not env-managed.
+     */
+    _envBannerHtml: function(instance, index) {
+        if (index !== 0 || !instance.env_managed) return '';
+        return '<div class="env-warning-banner">This instance is configured via environment variables. Fields below are read-only.</div>';
+    },
+
+    /**
+     * Return 'disabled' attribute string if instance is env-managed (index 0 only).
+     */
+    _envDisabled: function(instance, index) {
+        return (index === 0 && instance.env_managed) ? 'disabled' : '';
+    },
+
+    /**
+     * After form generation, apply disabled state to env-managed instance inputs.
+     */
+    _applyEnvManagedState: function(container) {
+        const firstInstance = container.querySelector('.instance-item[data-instance-id="0"]');
+        if (!firstInstance || !firstInstance.querySelector('.env-warning-banner')) return;
+
+        // Disable connection fields
+        firstInstance.querySelectorAll('input[name="name"], input[name="api_url"], input[name="api_key"], input[name="enabled"]').forEach(input => {
+            input.disabled = true;
+        });
+    },
+
     // Get settings from form
     getFormSettings: function(container, appType) {
         let settings = {};
@@ -1116,7 +1157,12 @@ const SettingsForms = {
                     api_key: key || "",
                     enabled: enabled
                 };
-                
+
+                // Preserve env_managed flag so backend can strip env fields on save
+                if (instance.querySelector('.env-warning-banner')) {
+                    instanceObj.env_managed = true;
+                }
+
                 instances.push(instanceObj);
             });
             
@@ -1576,6 +1622,9 @@ const SettingsForms = {
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
                 button.disabled = true;
                 
+                // Include instance index so backend can resolve masked keys
+                const instanceIndex = parseInt(instancePanel.dataset.instanceId || '0', 10);
+
                 // Make the API request
                 fetch(`/api/${appType}/test-connection`, {
                     method: 'POST',
@@ -1584,7 +1633,8 @@ const SettingsForms = {
                     },
                     body: JSON.stringify({
                         api_url: url,
-                        api_key: apiKey
+                        api_key: apiKey,
+                        instance_index: instanceIndex
                     })
                 })
                 .then(response => {
@@ -1712,7 +1762,7 @@ const SettingsForms = {
                         </div>
                         <div class="setting-item">
                             <label for="${appType}-key-${currentCount}">API Key:</label>
-                            <input type="text" id="${appType}-key-${currentCount}" name="api_key" value="" placeholder="API key">
+                            <input type="password" id="${appType}-key-${currentCount}" name="api_key" value="" placeholder="API key">
                              <p class="setting-help">API key for ${appType}</p>
                         </div>
                         <div class="setting-item">

@@ -32,6 +32,138 @@ KNOWN_APP_TYPES = ["sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros", 
 settings_cache = {}  # Format: {app_name: {'timestamp': timestamp, 'data': settings_dict}}
 CACHE_TTL = 5  # Cache time-to-live in seconds
 
+# Apps that support instance env var overrides (excludes "general")
+_INSTANCE_APP_TYPES = [a for a in KNOWN_APP_TYPES if a != "general"]
+
+# Sentinel prefix used when masking API keys for frontend responses
+_API_KEY_MASK_PREFIX = "****"
+
+
+def mask_api_key(key: str) -> str:
+    """Mask an API key for safe display, showing only the last 4 characters."""
+    if not key:
+        return ""
+    if len(key) > 4:
+        return _API_KEY_MASK_PREFIX + key[-4:]
+    return _API_KEY_MASK_PREFIX
+
+
+def is_masked_key(key: str) -> bool:
+    """Check if a key value is a masked placeholder rather than a real key."""
+    if not key:
+        return False
+    return key.startswith(_API_KEY_MASK_PREFIX)
+
+
+def redact_settings(settings: dict) -> dict:
+    """Return a copy of settings with API keys masked for frontend responses."""
+    import copy
+    redacted = copy.deepcopy(settings)
+
+    # Mask top-level api_key (legacy single-instance)
+    if "api_key" in redacted and redacted["api_key"]:
+        redacted["api_key"] = mask_api_key(redacted["api_key"])
+
+    # Mask api_key in each instance
+    if "instances" in redacted and isinstance(redacted["instances"], list):
+        for inst in redacted["instances"]:
+            if inst.get("api_key"):
+                inst["api_key"] = mask_api_key(inst["api_key"])
+
+    return redacted
+
+
+def resolve_api_key(app_type: str, api_key: str, instance_index: int = 0) -> str:
+    """Resolve an API key that may be masked back to the real stored key.
+
+    If the key is not masked, returns it as-is. Otherwise looks up the
+    real key from stored settings at the given instance index.
+    """
+    if not is_masked_key(api_key):
+        return api_key
+
+    settings = load_settings(app_type)
+    instances = settings.get("instances", [])
+    if instance_index < len(instances):
+        return instances[instance_index].get("api_key", "")
+
+    # Fallback to legacy top-level key
+    return settings.get("api_key", "")
+
+
+def _collect_env_instance(app_type: str) -> Optional[dict]:
+    """Scan env vars for a single instance config for the given app type.
+
+    Returns an instance dict if any env vars are set, or None otherwise.
+
+    Supported env vars:
+      {APP}_API_KEY, {APP}_API_URL, {APP}_NAME, {APP}_ENABLED
+    """
+    prefix = app_type.upper()
+    field_map = {
+        "API_KEY": "api_key",
+        "API_URL": "api_url",
+        "NAME": "name",
+        "ENABLED": "enabled",
+    }
+
+    instance = {}
+
+    for field_env, field_setting in field_map.items():
+        env_key = f"{prefix}_{field_env}"
+        env_value = os.environ.get(env_key)
+        if env_value is not None:
+            if field_setting == "enabled":
+                instance[field_setting] = env_value.lower() in ("true", "1", "yes")
+            else:
+                instance[field_setting] = env_value
+
+    if not instance:
+        return None
+
+    # Warn if partially configured
+    has_key = "api_key" in instance
+    has_url = "api_url" in instance
+    if has_key != has_url:
+        missing = "API_URL" if has_key else "API_KEY"
+        settings_logger.warning(
+            f"Incomplete env var config for {app_type}: "
+            f"{prefix}_{missing} is not set"
+        )
+
+    instance.setdefault("name", "Default")
+    instance.setdefault("enabled", True)
+    return instance
+
+
+def _apply_env_overrides(app_type: str, settings: dict) -> dict:
+    """Override instance settings with values from environment variables.
+
+    Always overrides instances[0] and sets env_managed=true on it.
+    """
+    if app_type not in _INSTANCE_APP_TYPES:
+        return settings
+
+    env_instance = _collect_env_instance(app_type)
+    if env_instance is None:
+        return settings
+
+    if "instances" not in settings or not isinstance(settings["instances"], list):
+        settings["instances"] = []
+
+    if len(settings["instances"]) > 0:
+        settings["instances"][0].update(env_instance)
+    else:
+        settings["instances"].append(env_instance)
+
+    settings["instances"][0]["env_managed"] = True
+
+    settings_logger.info(
+        f"Applied env var overrides for {app_type} instance 0"
+    )
+    return settings
+
+
 def clear_cache(app_name=None):
     """Clear the settings cache for a specific app or all apps."""
     global settings_cache
@@ -140,7 +272,10 @@ def load_settings(app_type, use_cache=True):
             if updated:
                 settings_logger.info(f"Added missing default keys to {app_type}.json")
                 save_settings(app_type, current_settings) # Use save_settings to handle writing
-            
+
+            # Apply environment variable overrides
+            current_settings = _apply_env_overrides(app_type, current_settings)
+
             # Update cache
             settings_cache[app_type] = {
                 'timestamp': time.time(),
@@ -154,7 +289,10 @@ def load_settings(app_type, use_cache=True):
         # Attempt to restore from default
         default_settings = load_default_app_settings(app_type)
         save_settings(app_type, default_settings) # Save the restored defaults
-        
+
+        # Apply environment variable overrides
+        default_settings = _apply_env_overrides(app_type, default_settings)
+
         # Update cache with defaults
         settings_cache[app_type] = {
             'timestamp': time.time(),
