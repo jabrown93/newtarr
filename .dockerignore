@@ -10,6 +10,8 @@
 # This is the critical exclusion: a local build must never bake these in.
 newtarr-config/
 config/
+.env
+.env.*
 
 # Editor / IDE / agent metadata
 .idea
