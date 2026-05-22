@@ -45,6 +45,8 @@ There is no test framework or linter configured. The app runs on port 9705.
 - `PORT` — Server port (default: 9705)
 - `DEBUG` — Enable debug logging
 - `TZ` — Timezone (default: UTC)
+- `NEWTARR_SESSION_COOKIE_SECURE` — Set to `true` to mark the session cookie `Secure` (enable when serving over HTTPS/TLS; default: `false`)
+- `NEWTARR_TRUSTED_ORIGINS` — Comma-separated extra origins accepted by the CSRF check; needed only for reverse proxies that do not preserve the original `Host` header
 
 ## Dependencies
 

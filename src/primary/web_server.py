@@ -7,6 +7,7 @@ Provides a web interface to view logs in real-time, manage settings, and include
 import os
 import datetime
 import time
+from urllib.parse import urlparse
 from threading import Lock
 from primary.utils.logger import LOG_DIR, APP_LOG_FILES, MAIN_LOG_FILE # Import log constants
 from primary import settings_manager # Import settings_manager
@@ -109,6 +110,16 @@ def _get_or_create_secret_key() -> str:
 
 app.secret_key = _get_or_create_secret_key()
 
+# Harden the session cookie. SESSION_COOKIE_SECURE is opt-in (env var) because
+# Newtarr is frequently accessed over plain HTTP on a LAN, where a Secure
+# cookie would never be sent and would break login. Enable it when serving
+# over HTTPS/TLS by setting NEWTARR_SESSION_COOKIE_SECURE=true.
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_COOKIE_SECURE=os.environ.get('NEWTARR_SESSION_COOKIE_SECURE', 'false').lower() == 'true',
+)
+
 # Register blueprints
 app.register_blueprint(common_bp)
 app.register_blueprint(sonarr_bp, url_prefix='/api/sonarr')
@@ -122,7 +133,57 @@ app.register_blueprint(stateful_api, url_prefix='/api/stateful')
 app.register_blueprint(history_blueprint, url_prefix='/api/history')
 app.register_blueprint(scheduler_api)
 
-# Register the authentication check to run before requests
+# --- CSRF protection -------------------------------------------------------
+# State-changing requests must originate from Newtarr's own UI. The Origin
+# header (with Referer as a fallback) is verified against the host serving the
+# request. Browsers always send Origin on cross-site POST/form submissions and
+# scripts on a malicious page cannot forge it, so this blocks classic CSRF
+# without per-form tokens. Requests with no Origin/Referer at all are not
+# browser-driven (curl, scripts) and so are not a CSRF vector.
+_CSRF_SAFE_METHODS = {'GET', 'HEAD', 'OPTIONS', 'TRACE'}
+
+
+def _csrf_trusted_hosts():
+    """Extra allowed origin hostnames from the NEWTARR_TRUSTED_ORIGINS env var.
+
+    Needed only when a reverse proxy does not preserve the original Host
+    header. Accepts a comma-separated list of origins or bare hostnames.
+    """
+    hosts = set()
+    for item in os.environ.get('NEWTARR_TRUSTED_ORIGINS', '').split(','):
+        item = item.strip()
+        if not item:
+            continue
+        parsed = urlparse(item if '//' in item else f'//{item}')
+        if parsed.hostname:
+            hosts.add(parsed.hostname.lower())
+    return hosts
+
+
+def csrf_protect():
+    """before_request handler: reject cross-origin state-changing requests."""
+    if request.method in _CSRF_SAFE_METHODS:
+        return None
+
+    source = request.headers.get('Origin') or request.headers.get('Referer')
+    if not source:
+        # No browser-supplied origin — not a CSRF vector (non-browser client).
+        return None
+
+    source_host = urlparse(source).hostname
+    expected_host = urlparse(request.host_url).hostname
+    allowed = {h.lower() for h in (_csrf_trusted_hosts() | {expected_host}) if h}
+    if source_host and source_host.lower() in allowed:
+        return None
+
+    get_logger("web_server").warning(
+        f"Blocked cross-origin {request.method} {request.path} from '{source}'"
+    )
+    return jsonify({"error": "Cross-origin request blocked"}), 403
+
+
+# Register the CSRF check, then the authentication check, to run before requests
+app.before_request(csrf_protect)
 app.before_request(authenticate_request)
 
 @app.after_request
