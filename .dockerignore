@@ -1,0 +1,57 @@
+# Keep secrets, local runtime data, and build cruft out of the image.
+# The Dockerfile uses `COPY . /app/`; anything not excluded here is shipped.
+
+# Version control & CI
+.git
+.gitignore
+.github
+
+# Local runtime data — config, secrets (.secret_key), logs, state.
+# This is the critical exclusion: a local build must never bake these in.
+newtarr-config/
+config/
+.env
+.env.*
+
+# Editor / IDE / agent metadata
+.idea
+.vscode
+.claude
+*.iml
+*.swp
+*.swo
+
+# Python caches & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Docs & project meta — not needed at runtime
+*.md
+docs/
+SECURITY-AUDIT.md
+
+# Build / packaging metadata not needed inside the image
+Dockerfile
+.dockerignore
+docker-compose.yml
+Makefile
+renovate.json
+
+# OS noise
+.DS_Store
+*.log
