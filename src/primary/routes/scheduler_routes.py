@@ -11,7 +11,10 @@ from flask import Blueprint, jsonify, request
 from datetime import datetime
 
 # Import the scheduler engine to get execution history
-from src.primary.scheduler_engine import get_execution_history
+from src.primary.scheduler_engine import (
+    get_execution_history,
+    is_valid_schedule_app_value,
+)
 
 # Create logger
 scheduler_logger = logging.getLogger("scheduler")
@@ -90,6 +93,31 @@ def save_schedules():
 
         if not schedules or not isinstance(schedules, dict):
             return jsonify({"error": "Invalid schedule data format"}), 400
+
+        # Validate every entry's "app" field is a syntactically safe identifier
+        # before persisting. The scheduler engine interpolates this value into a
+        # /config/{app}.json path; rejecting anything containing path separators
+        # or parent-directory tokens keeps traversal payloads off disk. The
+        # validator is intentionally permissive about the *set* of identifiers
+        # (it accepts UI-emitted composite values like "sonarr-all") — the
+        # executor's strict allowlist is what actually gates file access.
+        for group_key, entries in schedules.items():
+            if not isinstance(entries, list):
+                return jsonify({"error": f"Invalid entries for {group_key!r}"}), 400
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    return jsonify({"error": f"Invalid schedule entry in {group_key!r}"}), 400
+                app_value = entry.get("app")
+                if app_value is None:
+                    return (
+                        jsonify({"error": f"Schedule entry in {group_key!r} is missing 'app'"}),
+                        400,
+                    )
+                if not is_valid_schedule_app_value(app_value):
+                    return (
+                        jsonify({"error": f"Invalid app value in schedule entry: {app_value!r}"}),
+                        400,
+                    )
 
         # Save to file
         with open(SCHEDULE_FILE, 'w') as f:
