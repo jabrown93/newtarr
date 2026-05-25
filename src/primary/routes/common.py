@@ -16,7 +16,8 @@ from ..auth import (
     verify_user, create_session, get_username_from_session, SESSION_COOKIE_NAME,
     change_username as auth_change_username, change_password as auth_change_password,
     validate_password_strength, logout, verify_session, disable_2fa_with_password_and_otp,
-    user_exists, create_user, generate_2fa_secret, verify_2fa_code, is_2fa_enabled # Add missing auth imports
+    user_exists, create_user, generate_2fa_secret, verify_2fa_code, is_2fa_enabled, # Add missing auth imports
+    login_rate_limited, record_failed_login, clear_failed_logins, get_client_ip
 )
 from ..utils.logger import logger # Ensure logger is imported
 from .. import settings_manager # Import settings_manager
@@ -53,6 +54,17 @@ def login_route():
                  logger.warning("Login attempt with missing username or password.")
                  return jsonify({"success": False, "error": "Username and password are required"}), 400
 
+            # Throttle online brute-force attacks. Use the real client IP
+            # (X-Forwarded-For when the peer is a trusted local proxy) so a
+            # single attacker behind a shared proxy can't lock out other users.
+            client_ip = get_client_ip()
+            if login_rate_limited(client_ip):
+                logger.warning(f"Login blocked: too many failed attempts from {client_ip}")
+                return jsonify({
+                    "success": False,
+                    "error": "Too many failed login attempts. Please wait a few minutes and try again."
+                }), 429
+
             # Call verify_user which now returns (auth_success, needs_2fa)
             auth_success, needs_2fa = verify_user(username, password, twoFactorCode)
             
@@ -60,6 +72,7 @@ def login_route():
 
             if auth_success:
                 # User is authenticated (password correct, and 2FA if needed was correct)
+                clear_failed_logins(client_ip)
                 session_token = create_session(username)
                 session[SESSION_COOKIE_NAME] = session_token # Store token in Flask session
                 response = jsonify({"success": True, "redirect": "/"}) # Add redirect URL
@@ -68,6 +81,9 @@ def login_route():
             elif needs_2fa:
                 # Authentication failed *because* 2FA was required (or code was invalid)
                 # The specific reason (missing vs invalid code) is logged in verify_user
+                # A wrong code counts as a failed attempt; the initial 2FA prompt does not.
+                if twoFactorCode:
+                    record_failed_login(client_ip)
                 logger.warning(f"Login failed for '{username}': 2FA required or invalid.")
                 logger.debug(f"Returning 2FA required response: {{\"success\": False, \"requires_2fa\": True, \"requiresTwoFactor\": True, \"error\": \"Invalid or missing 2FA code\"}}")
                 
@@ -83,6 +99,7 @@ def login_route():
             else:
                 # Authentication failed for other reasons (e.g., wrong password, user not found)
                 # Specific reason logged in verify_user
+                record_failed_login(client_ip)
                 logger.warning(f"Login failed for '{username}': Invalid credentials or other error.")
                 return jsonify({"success": False, "error": "Invalid username or password"}), 401 # Use 401
 

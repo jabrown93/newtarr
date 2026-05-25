@@ -10,6 +10,8 @@ import json
 import hashlib
 import secrets
 import time
+import ipaddress
+import threading
 import pathlib
 import base64
 import io
@@ -32,6 +34,93 @@ SESSION_COOKIE_NAME = "newtarr_session"
 
 # Store active sessions
 active_sessions = {}
+
+
+# --- Local network detection ---------------------------------------------
+
+def _is_local_ip(addr: str) -> bool:
+    """Return True if addr is a loopback, link-local, or private (RFC1918/ULA)
+    address. Used by the local_access_bypass auth mode."""
+    if not addr:
+        return False
+    try:
+        ip = ipaddress.ip_address(addr.strip())
+    except ValueError:
+        return False
+    # Unwrap IPv4-mapped IPv6 addresses (e.g. ::ffff:192.168.1.5)
+    if ip.version == 6 and ip.ipv4_mapped is not None:
+        ip = ip.ipv4_mapped
+    return ip.is_loopback or ip.is_link_local or ip.is_private
+
+
+def _resolve_client_ip(remote_addr: Optional[str], forwarded_for: Optional[str]) -> Optional[str]:
+    """Derive the real client IP from the direct peer and an X-Forwarded-For
+    header. XFF is only honored when the direct peer is itself local —
+    otherwise XFF is attacker-controlled and ignored."""
+    if not remote_addr:
+        return None
+    if forwarded_for and _is_local_ip(remote_addr):
+        # First entry in the chain is the originating client.
+        client = forwarded_for.split(',')[0].strip()
+        if client:
+            return client
+    return remote_addr
+
+
+def get_client_ip() -> Optional[str]:
+    """Return the real client IP for the current Flask request, honoring
+    X-Forwarded-For only when the direct peer is a local reverse proxy."""
+    return _resolve_client_ip(request.remote_addr, request.headers.get('X-Forwarded-For'))
+
+
+# --- Login rate limiting --------------------------------------------------
+# Tracks failed login attempts per source IP to slow online brute-force
+# attacks. State is in-memory (single-process Waitress deployment), mirroring
+# how active_sessions is handled.
+_LOGIN_ATTEMPT_WINDOW = 300   # seconds
+_LOGIN_MAX_ATTEMPTS = 10      # failed attempts allowed per window
+_login_attempts: Dict[str, list] = {}
+_login_attempts_lock = threading.Lock()
+
+
+def _recent_attempts(ip: str, now: float) -> list:
+    """Return this IP's failed-attempt timestamps still within the window."""
+    return [t for t in _login_attempts.get(ip, []) if now - t < _LOGIN_ATTEMPT_WINDOW]
+
+
+def login_rate_limited(ip: str) -> bool:
+    """Return True if this IP has exceeded the failed-login limit."""
+    if not ip:
+        return False
+    now = time.time()
+    with _login_attempts_lock:
+        attempts = _recent_attempts(ip, now)
+        _login_attempts[ip] = attempts
+        return len(attempts) >= _LOGIN_MAX_ATTEMPTS
+
+
+def record_failed_login(ip: str) -> None:
+    """Record a failed login attempt for this IP."""
+    if not ip:
+        return
+    now = time.time()
+    with _login_attempts_lock:
+        attempts = _recent_attempts(ip, now)
+        attempts.append(now)
+        _login_attempts[ip] = attempts
+        # Opportunistically drop IPs whose attempts have all aged out.
+        for stale_ip in [k for k, v in _login_attempts.items()
+                         if not any(now - t < _LOGIN_ATTEMPT_WINDOW for t in v)]:
+            del _login_attempts[stale_ip]
+
+
+def clear_failed_logins(ip: str) -> None:
+    """Clear recorded failures for this IP (call on successful login)."""
+    if not ip:
+        return
+    with _login_attempts_lock:
+        _login_attempts.pop(ip, None)
+
 
 # --- Add Helper functions for user data ---
 def get_user_data() -> Dict[str, Any]:
@@ -336,53 +425,19 @@ def authenticate_request():
         pass
 
     remote_addr = request.remote_addr
-    logger.info(f"Request IP address: {remote_addr}")
+    client_ip = get_client_ip()
+    logger.info(f"Request IP address: {client_ip} (peer {remote_addr})")
 
     if local_access_bypass:
-        # Common local network IP ranges
-        local_networks = [
-            '127.0.0.1',      # localhost
-            '::1',            # localhost IPv6
-            '10.',            # 10.0.0.0/8
-            '192.168.'        # 192.168.0.0/16
-        ]
-        is_local = False
-
-        # Only trust X-Forwarded-For when the direct connection is from a local/trusted IP
-        # (i.e., the request is coming through a local reverse proxy)
         forwarded_for = request.headers.get('X-Forwarded-For')
-        remote_is_local = any(
-            remote_addr == network or (network.endswith('.') and remote_addr.startswith(network))
-            for network in local_networks
-        )
-        if forwarded_for and remote_is_local:
-            logger.debug(f"X-Forwarded-For header detected from trusted proxy ({remote_addr}): {forwarded_for}")
-            # Take the first IP in the chain which is typically the client's real IP
-            possible_client_ip = forwarded_for.split(',')[0].strip()
-            logger.debug(f"Checking if forwarded IP {possible_client_ip} is local")
-
-            # Check if this forwarded IP is a local network IP
-            for network in local_networks:
-                if possible_client_ip == network or (network.endswith('.') and possible_client_ip.startswith(network)):
-                    is_local = True
-                    logger.info(f"Forwarded IP {possible_client_ip} is a local network IP (matches {network})")
-                    break
-        elif forwarded_for and not remote_is_local:
+        if forwarded_for and not _is_local_ip(remote_addr):
             logger.warning(f"Ignoring X-Forwarded-For header from untrusted source ({remote_addr})")
 
-        # Check if direct remote_addr is a local network IP if not already determined
-        if not is_local:
-            for network in local_networks:
-                if remote_addr == network or (network.endswith('.') and remote_addr.startswith(network)):
-                    is_local = True
-                    logger.info(f"Direct IP {remote_addr} is a local network IP (matches {network})")
-                    break
-
-        if is_local:
-            logger.info(f"Local network access from {remote_addr} - Authentication bypassed! (Local Bypass Mode)")
+        if _is_local_ip(client_ip):
+            logger.info(f"Local network access from {client_ip} - Authentication bypassed (Local Bypass Mode)")
             return None
         else:
-            logger.warning(f"Access from {remote_addr} is not recognized as local network - Authentication required")
+            logger.warning(f"Access from {client_ip} is not recognized as local network - Authentication required")
     else:
         logger.info("Local Bypass Mode is DISABLED - Authentication required")
 

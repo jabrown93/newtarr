@@ -14,9 +14,12 @@ docker compose up --build
 
 # Build image only
 docker build -t newtarr .
+
+# Run unit tests (stdlib unittest, no extra deps beyond requirements.txt)
+python -m unittest discover -s tests -v
 ```
 
-There is no test framework or linter configured. The app runs on port 9705.
+The app runs on port 9705. No linter is configured. Tests live under `tests/` and cover pure helpers only (no Flask app, no /config writes).
 
 ## Architecture
 
@@ -45,6 +48,8 @@ There is no test framework or linter configured. The app runs on port 9705.
 - `PORT` — Server port (default: 9705)
 - `DEBUG` — Enable debug logging
 - `TZ` — Timezone (default: UTC)
+- `NEWTARR_SESSION_COOKIE_SECURE` — Set to `true` to mark the session cookie `Secure` (enable when serving over HTTPS/TLS; default: `false`)
+- `NEWTARR_TRUSTED_ORIGINS` — Comma-separated extra origins accepted by the CSRF check; needed only for reverse proxies that do not preserve the original `Host` header
 
 ## Dependencies
 

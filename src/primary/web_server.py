@@ -32,8 +32,10 @@ from src.primary.utils.logger import setup_main_logger, get_logger, LOG_DIR, upd
 from src.primary.auth import (
     authenticate_request, user_exists, create_user, verify_user, create_session,
     logout, SESSION_COOKIE_NAME, is_2fa_enabled, generate_2fa_secret,
-    verify_2fa_code, disable_2fa, change_username, change_password
+    verify_2fa_code, disable_2fa, change_username, change_password,
+    _is_local_ip
 )
+from src.primary.utils import csrf as csrf_util
 # Import blueprint for common routes
 from src.primary.routes.common import common_bp
 
@@ -109,6 +111,16 @@ def _get_or_create_secret_key() -> str:
 
 app.secret_key = _get_or_create_secret_key()
 
+# Harden the session cookie. SESSION_COOKIE_SECURE is opt-in (env var) because
+# Newtarr is frequently accessed over plain HTTP on a LAN, where a Secure
+# cookie would never be sent and would break login. Enable it when serving
+# over HTTPS/TLS by setting NEWTARR_SESSION_COOKIE_SECURE=true.
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    SESSION_COOKIE_SECURE=os.environ.get('NEWTARR_SESSION_COOKIE_SECURE', 'false').lower() == 'true',
+)
+
 # Register blueprints
 app.register_blueprint(common_bp)
 app.register_blueprint(sonarr_bp, url_prefix='/api/sonarr')
@@ -122,7 +134,45 @@ app.register_blueprint(stateful_api, url_prefix='/api/stateful')
 app.register_blueprint(history_blueprint, url_prefix='/api/history')
 app.register_blueprint(scheduler_api)
 
-# Register the authentication check to run before requests
+# --- CSRF protection -------------------------------------------------------
+# State-changing requests must originate from Newtarr's own UI. The Origin
+# header (with Referer as a fallback) is verified against the origin serving
+# the request, compared as (scheme, hostname, port) — not hostname alone, so
+# another app on the same host but a different port can't forge requests.
+# Pure policy lives in src.primary.utils.csrf and is unit-tested there.
+
+def _expected_origin():
+    """Origin this request was actually addressed to. Honors X-Forwarded-Proto
+    / X-Forwarded-Host when the direct peer is a local reverse proxy — same
+    trust model used for X-Forwarded-For elsewhere."""
+    scheme = request.scheme
+    host = request.host
+    if _is_local_ip(request.remote_addr):
+        fwd_proto = request.headers.get('X-Forwarded-Proto')
+        if fwd_proto:
+            scheme = fwd_proto.split(',')[0].strip().lower()
+        fwd_host = request.headers.get('X-Forwarded-Host')
+        if fwd_host:
+            host = fwd_host.split(',')[0].strip()
+    return csrf_util.normalize_origin(scheme, host)
+
+
+def csrf_protect():
+    """before_request handler: reject cross-origin state-changing requests."""
+    source = request.headers.get('Origin') or request.headers.get('Referer')
+    trusted_origins, trusted_hostnames = csrf_util.trusted_origins_from_env()
+    if csrf_util.request_allowed(request.method, source, _expected_origin(),
+                                 trusted_origins, trusted_hostnames):
+        return None
+
+    get_logger("web_server").warning(
+        f"Blocked cross-origin {request.method} {request.path} from '{source}'"
+    )
+    return jsonify({"error": "Cross-origin request blocked"}), 403
+
+
+# Register the CSRF check, then the authentication check, to run before requests
+app.before_request(csrf_protect)
 app.before_request(authenticate_request)
 
 @app.after_request

@@ -43,6 +43,10 @@ COPY . /app/
 # Set environment variables
 ENV PYTHONPATH=/app
 
+# Run as the non-root user (uid/gid 65532). /config is owned by this user and
+# the app binds an unprivileged port, so no root capabilities are required.
+USER 65532:65532
+
 # Expose port
 EXPOSE 9705
 
