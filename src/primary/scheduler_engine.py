@@ -286,6 +286,12 @@ def execute_action(action_entry):
                     add_to_history(action_entry, "error", error_message)
                     return False
 
+        elif not isinstance(action_type, str):
+            error_message = f"Invalid action type: expected string, got {type(action_type).__name__}"
+            scheduler_logger.error(error_message)
+            add_to_history(action_entry, "error", error_message)
+            return False
+
         # Handle the API limit actions based on the predefined values
         elif action_type.startswith("api-") or action_type.startswith("API Limits "):
             # Extract the API limit value from the action type
