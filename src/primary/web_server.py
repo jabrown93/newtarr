@@ -7,7 +7,6 @@ Provides a web interface to view logs in real-time, manage settings, and include
 import os
 import datetime
 import time
-from urllib.parse import urlparse
 from threading import Lock
 from primary.utils.logger import LOG_DIR, APP_LOG_FILES, MAIN_LOG_FILE # Import log constants
 from primary import settings_manager # Import settings_manager
@@ -33,8 +32,10 @@ from src.primary.utils.logger import setup_main_logger, get_logger, LOG_DIR, upd
 from src.primary.auth import (
     authenticate_request, user_exists, create_user, verify_user, create_session,
     logout, SESSION_COOKIE_NAME, is_2fa_enabled, generate_2fa_secret,
-    verify_2fa_code, disable_2fa, change_username, change_password
+    verify_2fa_code, disable_2fa, change_username, change_password,
+    _is_local_ip
 )
+from src.primary.utils import csrf as csrf_util
 # Import blueprint for common routes
 from src.primary.routes.common import common_bp
 
@@ -135,45 +136,33 @@ app.register_blueprint(scheduler_api)
 
 # --- CSRF protection -------------------------------------------------------
 # State-changing requests must originate from Newtarr's own UI. The Origin
-# header (with Referer as a fallback) is verified against the host serving the
-# request. Browsers always send Origin on cross-site POST/form submissions and
-# scripts on a malicious page cannot forge it, so this blocks classic CSRF
-# without per-form tokens. Requests with no Origin/Referer at all are not
-# browser-driven (curl, scripts) and so are not a CSRF vector.
-_CSRF_SAFE_METHODS = {'GET', 'HEAD', 'OPTIONS', 'TRACE'}
+# header (with Referer as a fallback) is verified against the origin serving
+# the request, compared as (scheme, hostname, port) — not hostname alone, so
+# another app on the same host but a different port can't forge requests.
+# Pure policy lives in src.primary.utils.csrf and is unit-tested there.
 
-
-def _csrf_trusted_hosts():
-    """Extra allowed origin hostnames from the NEWTARR_TRUSTED_ORIGINS env var.
-
-    Needed only when a reverse proxy does not preserve the original Host
-    header. Accepts a comma-separated list of origins or bare hostnames.
-    """
-    hosts = set()
-    for item in os.environ.get('NEWTARR_TRUSTED_ORIGINS', '').split(','):
-        item = item.strip()
-        if not item:
-            continue
-        parsed = urlparse(item if '//' in item else f'//{item}')
-        if parsed.hostname:
-            hosts.add(parsed.hostname.lower())
-    return hosts
+def _expected_origin():
+    """Origin this request was actually addressed to. Honors X-Forwarded-Proto
+    / X-Forwarded-Host when the direct peer is a local reverse proxy — same
+    trust model used for X-Forwarded-For elsewhere."""
+    scheme = request.scheme
+    host = request.host
+    if _is_local_ip(request.remote_addr):
+        fwd_proto = request.headers.get('X-Forwarded-Proto')
+        if fwd_proto:
+            scheme = fwd_proto.split(',')[0].strip().lower()
+        fwd_host = request.headers.get('X-Forwarded-Host')
+        if fwd_host:
+            host = fwd_host.split(',')[0].strip()
+    return csrf_util.normalize_origin(scheme, host)
 
 
 def csrf_protect():
     """before_request handler: reject cross-origin state-changing requests."""
-    if request.method in _CSRF_SAFE_METHODS:
-        return None
-
     source = request.headers.get('Origin') or request.headers.get('Referer')
-    if not source:
-        # No browser-supplied origin — not a CSRF vector (non-browser client).
-        return None
-
-    source_host = urlparse(source).hostname
-    expected_host = urlparse(request.host_url).hostname
-    allowed = {h.lower() for h in (_csrf_trusted_hosts() | {expected_host}) if h}
-    if source_host and source_host.lower() in allowed:
+    trusted_origins, trusted_hostnames = csrf_util.trusted_origins_from_env()
+    if csrf_util.request_allowed(request.method, source, _expected_origin(),
+                                 trusted_origins, trusted_hostnames):
         return None
 
     get_logger("web_server").warning(

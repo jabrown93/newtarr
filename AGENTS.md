@@ -14,9 +14,12 @@ docker compose up --build
 
 # Build image only
 docker build -t newtarr .
+
+# Run unit tests (stdlib unittest, no extra deps beyond requirements.txt)
+python -m unittest discover -s tests -v
 ```
 
-There is no test framework or linter configured. The app runs on port 9705.
+The app runs on port 9705. No linter is configured. Tests live under `tests/` and cover pure helpers only (no Flask app, no /config writes).
 
 ## Architecture
 

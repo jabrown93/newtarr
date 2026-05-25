@@ -17,7 +17,7 @@ from ..auth import (
     change_username as auth_change_username, change_password as auth_change_password,
     validate_password_strength, logout, verify_session, disable_2fa_with_password_and_otp,
     user_exists, create_user, generate_2fa_secret, verify_2fa_code, is_2fa_enabled, # Add missing auth imports
-    login_rate_limited, record_failed_login, clear_failed_logins
+    login_rate_limited, record_failed_login, clear_failed_logins, get_client_ip
 )
 from ..utils.logger import logger # Ensure logger is imported
 from .. import settings_manager # Import settings_manager
@@ -54,8 +54,10 @@ def login_route():
                  logger.warning("Login attempt with missing username or password.")
                  return jsonify({"success": False, "error": "Username and password are required"}), 400
 
-            # Throttle online brute-force attacks
-            client_ip = request.remote_addr
+            # Throttle online brute-force attacks. Use the real client IP
+            # (X-Forwarded-For when the peer is a trusted local proxy) so a
+            # single attacker behind a shared proxy can't lock out other users.
+            client_ip = get_client_ip()
             if login_rate_limited(client_ip):
                 logger.warning(f"Login blocked: too many failed attempts from {client_ip}")
                 return jsonify({

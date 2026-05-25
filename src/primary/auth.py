@@ -53,6 +53,26 @@ def _is_local_ip(addr: str) -> bool:
     return ip.is_loopback or ip.is_link_local or ip.is_private
 
 
+def _resolve_client_ip(remote_addr: Optional[str], forwarded_for: Optional[str]) -> Optional[str]:
+    """Derive the real client IP from the direct peer and an X-Forwarded-For
+    header. XFF is only honored when the direct peer is itself local —
+    otherwise XFF is attacker-controlled and ignored."""
+    if not remote_addr:
+        return None
+    if forwarded_for and _is_local_ip(remote_addr):
+        # First entry in the chain is the originating client.
+        client = forwarded_for.split(',')[0].strip()
+        if client:
+            return client
+    return remote_addr
+
+
+def get_client_ip() -> Optional[str]:
+    """Return the real client IP for the current Flask request, honoring
+    X-Forwarded-For only when the direct peer is a local reverse proxy."""
+    return _resolve_client_ip(request.remote_addr, request.headers.get('X-Forwarded-For'))
+
+
 # --- Login rate limiting --------------------------------------------------
 # Tracks failed login attempts per source IP to slow online brute-force
 # attacks. State is in-memory (single-process Waitress deployment), mirroring
@@ -405,31 +425,19 @@ def authenticate_request():
         pass
 
     remote_addr = request.remote_addr
-    logger.info(f"Request IP address: {remote_addr}")
+    client_ip = get_client_ip()
+    logger.info(f"Request IP address: {client_ip} (peer {remote_addr})")
 
     if local_access_bypass:
-        # When a local reverse proxy forwards the request, the real client is
-        # in X-Forwarded-For. Only trust XFF when the direct peer (remote_addr)
-        # is itself local — otherwise XFF is attacker-controlled and spoofable.
-        remote_is_local = _is_local_ip(remote_addr)
         forwarded_for = request.headers.get('X-Forwarded-For')
+        if forwarded_for and not _is_local_ip(remote_addr):
+            logger.warning(f"Ignoring X-Forwarded-For header from untrusted source ({remote_addr})")
 
-        if forwarded_for and remote_is_local:
-            # First entry in the chain is the originating client.
-            client_ip = forwarded_for.split(',')[0].strip()
-            logger.debug(f"X-Forwarded-For from trusted proxy ({remote_addr}): {forwarded_for}")
-            is_local = _is_local_ip(client_ip)
-            logger.info(f"Forwarded client IP {client_ip} local={is_local}")
-        else:
-            if forwarded_for and not remote_is_local:
-                logger.warning(f"Ignoring X-Forwarded-For header from untrusted source ({remote_addr})")
-            is_local = remote_is_local
-
-        if is_local:
-            logger.info(f"Local network access from {remote_addr} - Authentication bypassed (Local Bypass Mode)")
+        if _is_local_ip(client_ip):
+            logger.info(f"Local network access from {client_ip} - Authentication bypassed (Local Bypass Mode)")
             return None
         else:
-            logger.warning(f"Access from {remote_addr} is not recognized as local network - Authentication required")
+            logger.warning(f"Access from {client_ip} is not recognized as local network - Authentication required")
     else:
         logger.info("Local Bypass Mode is DISABLED - Authentication required")
 
