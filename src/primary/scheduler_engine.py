@@ -26,6 +26,14 @@ SCHEDULE_CHECK_INTERVAL = 60  # Check schedule every minute
 SCHEDULE_DIR = "/config/scheduler"
 SCHEDULE_FILE = os.path.join(SCHEDULE_DIR, "schedule.json")
 
+# Allowlist of app identifiers the executor is permitted to address.
+# Used to constrain the {app}.json path built inside execute_action so that
+# a user-supplied "app" field cannot traverse to arbitrary JSON files under /config.
+SCHEDULER_APP_ALLOWLIST = frozenset(
+    {"sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"}
+)
+SCHEDULER_TARGET_ALLOWLIST = SCHEDULER_APP_ALLOWLIST | {"global"}
+
 # Track last executed actions to prevent duplicates
 last_executed_actions = {}
 
@@ -109,7 +117,16 @@ def execute_action(action_entry):
     action_type = action_entry.get("action")
     app_type = action_entry.get("app")
     app_id = action_entry.get("id")
-    
+
+    # Reject any app value that is not in the allowlist. app_type is interpolated
+    # into a /config/{app}.json path below; without this check a crafted schedule
+    # entry could traverse to arbitrary JSON files under /config.
+    if app_type not in SCHEDULER_TARGET_ALLOWLIST:
+        message = f"Rejected scheduled action with disallowed app value: {app_type!r}"
+        scheduler_logger.warning(message)
+        add_to_history(action_entry, "error", message)
+        return False
+
     # Generate a unique key for this action to track execution
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
     execution_key = f"{app_id}_{current_date}"

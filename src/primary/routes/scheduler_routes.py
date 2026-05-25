@@ -11,7 +11,10 @@ from flask import Blueprint, jsonify, request
 from datetime import datetime
 
 # Import the scheduler engine to get execution history
-from src.primary.scheduler_engine import get_execution_history
+from src.primary.scheduler_engine import (
+    SCHEDULER_TARGET_ALLOWLIST,
+    get_execution_history,
+)
 
 # Create logger
 scheduler_logger = logging.getLogger("scheduler")
@@ -90,6 +93,23 @@ def save_schedules():
 
         if not schedules or not isinstance(schedules, dict):
             return jsonify({"error": "Invalid schedule data format"}), 400
+
+        # Validate every entry's "app" field against the executor allowlist.
+        # The scheduler engine interpolates this value into a /config/{app}.json
+        # path; rejecting unknown values here keeps malformed/malicious schedules
+        # off disk in the first place.
+        for group_key, entries in schedules.items():
+            if not isinstance(entries, list):
+                return jsonify({"error": f"Invalid entries for {group_key!r}"}), 400
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    return jsonify({"error": f"Invalid schedule entry in {group_key!r}"}), 400
+                app_value = entry.get("app")
+                if app_value is not None and app_value not in SCHEDULER_TARGET_ALLOWLIST:
+                    return (
+                        jsonify({"error": f"Disallowed app value in schedule entry: {app_value!r}"}),
+                        400,
+                    )
 
         # Save to file
         with open(SCHEDULE_FILE, 'w') as f:
