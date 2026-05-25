@@ -5,6 +5,7 @@ Handles execution of scheduled actions from schedule.json
 """
 
 import os
+import re
 import json
 import threading
 import datetime
@@ -33,6 +34,25 @@ SCHEDULER_APP_ALLOWLIST = frozenset(
     {"sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"}
 )
 SCHEDULER_TARGET_ALLOWLIST = SCHEDULER_APP_ALLOWLIST | {"global"}
+
+# Shape check for an `app` field on a schedule entry. This is intentionally
+# permissive (e.g. it allows UI-emitted composite values like "sonarr-all" or
+# "whisparr-v3") because the per-instance scheduler executor has historically
+# treated such values as no-ops via os.path.exists. The strict allowlist above
+# is what actually gates path construction; this regex only rejects values
+# that look like traversal payloads (path separators, parent-directory tokens,
+# embedded NULs, etc.) so they never get persisted to schedule.json.
+SCHEDULER_APP_FIELD_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+def is_valid_schedule_app_value(value) -> bool:
+    """Return True if `value` is a syntactically safe `app` field value.
+
+    Used by the save endpoint to keep traversal payloads off disk while still
+    accepting the composite identifiers (e.g. "sonarr-all", "whisparr-v3")
+    that the existing UI emits.
+    """
+    return isinstance(value, str) and bool(SCHEDULER_APP_FIELD_PATTERN.fullmatch(value))
 
 # Track last executed actions to prevent duplicates
 last_executed_actions = {}
@@ -118,13 +138,24 @@ def execute_action(action_entry):
     app_type = action_entry.get("app")
     app_id = action_entry.get("id")
 
-    # Reject any app value that is not in the allowlist. app_type is interpolated
-    # into a /config/{app}.json path below; without this check a crafted schedule
-    # entry could traverse to arbitrary JSON files under /config.
+    # Constrain app_type before it is interpolated into the /config/{app}.json
+    # path below. Two cases:
+    #   1. Values that look like an attack payload (not a string, or containing
+    #      path separators / parent-directory tokens / NULs) are rejected loudly
+    #      with a history entry so the security event is visible.
+    #   2. Values that are syntactically safe but outside the allowlist (e.g.
+    #      the UI's composite identifiers like "sonarr-all" or "whisparr-v3",
+    #      which historically were no-ops via os.path.exists) are skipped
+    #      quietly to preserve existing behavior without polluting history.
     if app_type not in SCHEDULER_TARGET_ALLOWLIST:
-        message = f"Rejected scheduled action with disallowed app value: {app_type!r}"
-        scheduler_logger.warning(message)
-        add_to_history(action_entry, "error", message)
+        if not is_valid_schedule_app_value(app_type):
+            message = f"Rejected scheduled action with unsafe app value: {app_type!r}"
+            scheduler_logger.warning(message)
+            add_to_history(action_entry, "error", message)
+        else:
+            scheduler_logger.debug(
+                f"Skipping scheduled action with unsupported app value: {app_type!r}"
+            )
         return False
 
     # Generate a unique key for this action to track execution
