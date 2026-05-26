@@ -163,45 +163,6 @@ def test_connection_endpoint():
 
     return test_connection(api_url, api_key)
 
-@eros_bp.route('/test-settings', methods=['GET'])
-def test_eros_settings():
-    """Debug endpoint to test Eros settings loading"""
-    try:
-        # Directly read the settings file to bypass any potential caching
-        import json
-        import os
-        
-        # Check all possible settings locations
-        possible_locations = [
-            "/config/eros.json",  # Main Docker mount
-            "/app/config/eros.json",  # Alternate location
-            os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "config", "eros.json")  # Relative path
-        ]
-        
-        results = {}
-        
-        # Try all locations
-        for location in possible_locations:
-            results[location] = {"exists": os.path.exists(location)}
-            if os.path.exists(location):
-                try:
-                    with open(location, 'r') as f:
-                        results[location]["content"] = json.load(f)
-                except Exception as e:
-                    results[location]["error"] = str(e)
-        
-        # Also try loading via settings_manager
-        try:
-            from src.primary.settings_manager import load_settings
-            settings = load_settings("eros")
-            results["settings_manager"] = settings
-        except Exception as e:
-            results["settings_manager_error"] = str(e)
-            
-        return jsonify(results)
-    except Exception as e:
-        return jsonify({"error": str(e)})
-
 @eros_bp.route('/reset-processed', methods=['POST'])
 def reset_processed_state():
     """Reset the processed state files for Eros"""

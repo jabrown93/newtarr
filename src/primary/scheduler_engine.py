@@ -5,6 +5,7 @@ Handles execution of scheduled actions from schedule.json
 """
 
 import os
+import re
 import json
 import threading
 import datetime
@@ -59,6 +60,24 @@ def resolve_schedule_target(app_value):
     if not isinstance(app_value, str):
         return None
     return SCHEDULE_APP_TARGETS.get(app_value)
+
+# Shape check for an `app` field on a schedule entry. This is intentionally
+# permissive (e.g. it allows UI-emitted composite values like "sonarr-all" or
+# "whisparr-v3") because resolution to config targets is handled by
+# `resolve_schedule_target()`. This regex only rejects values that look like
+# traversal payloads (path separators, parent-directory tokens, embedded NULs,
+# etc.) so they never get persisted to schedule.json.
+SCHEDULER_APP_FIELD_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
+
+
+def is_valid_schedule_app_value(value) -> bool:
+    """Return True if `value` is a syntactically safe `app` field value.
+
+    Used by the save endpoint to keep traversal payloads off disk while still
+    accepting the composite identifiers (e.g. "sonarr-all", "whisparr-v3")
+    that the existing UI emits.
+    """
+    return isinstance(value, str) and bool(SCHEDULER_APP_FIELD_PATTERN.fullmatch(value))
 
 # Track last executed actions to prevent duplicates
 last_executed_actions = {}
@@ -149,9 +168,14 @@ def execute_action(action_entry):
     # paths and clear caches; `app_type` is preserved for log/history display.
     target_app = resolve_schedule_target(app_type)
     if target_app is None:
-        scheduler_logger.debug(
-            f"Skipping scheduled action with unsupported app value: {app_type!r}"
-        )
+        if not is_valid_schedule_app_value(app_type):
+            message = f"Rejected scheduled action with unsafe app value: {app_type!r}"
+            scheduler_logger.warning(message)
+            add_to_history(action_entry, "error", message)
+        else:
+            scheduler_logger.debug(
+                f"Skipping scheduled action with unsupported app value: {app_type!r}"
+            )
         return False
 
     # Generate a unique key for this action to track execution
