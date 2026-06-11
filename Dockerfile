@@ -1,5 +1,5 @@
 # Build stage: install dependencies using the dev image (has shell + tools)
-FROM dhi.io/python:3.14.5-dev AS builder
+FROM dhi.io/python:3.14.6-dev AS builder
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ RUN mkdir -p /config/settings /config/stateful /config/user /config/logs && \
     chmod -R 700 /config
 
 # Final stage: minimal runtime image
-FROM dhi.io/python:3.14.5
+FROM dhi.io/python:3.14.6
 
 WORKDIR /app
 
