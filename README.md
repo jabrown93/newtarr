@@ -1,5 +1,10 @@
 # Newtarr
 
+[![Release](https://img.shields.io/github/v/release/jabrown93/newtarr)](https://github.com/jabrown93/newtarr/releases)
+[![Build](https://img.shields.io/github/actions/workflow/status/jabrown93/newtarr/release.yml?label=build)](https://github.com/jabrown93/newtarr/actions/workflows/release.yml)
+[![Issues](https://img.shields.io/github/issues/jabrown93/newtarr)](https://github.com/jabrown93/newtarr/issues)
+[![License](https://img.shields.io/github/license/jabrown93/newtarr)](LICENSE)
+
 ## Warning
 
 AI agents have been used in this code base, and while efforts have been made to ensure code quality and security, there
