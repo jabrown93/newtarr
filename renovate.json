@@ -1,5 +1,6 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "description": "ignoreTests is required here, not a shortcut: release.yml is this repo's only workflow and it triggers on `push: tags: v*.*.*`, so nothing ever runs against a renovate/** branch. GitHub's combined status API reports `pending` when a ref has zero checks, which the inherited :automergeRequireAllStatusChecks (ignoreTests: false) reads as not-green -- every automerge would wait forever. Delete this the moment a pull_request- or branch-triggered CI workflow lands.",
     "extends": [
         "local>jabrown93/.github:renovate-config"
     ],
