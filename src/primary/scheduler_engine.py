@@ -27,21 +27,46 @@ SCHEDULE_CHECK_INTERVAL = 60  # Check schedule every minute
 SCHEDULE_DIR = "/config/scheduler"
 SCHEDULE_FILE = os.path.join(SCHEDULE_DIR, "schedule.json")
 
-# Allowlist of app identifiers the executor is permitted to address.
-# Used to constrain the {app}.json path built inside execute_action so that
-# a user-supplied "app" field cannot traverse to arbitrary JSON files under /config.
-SCHEDULER_APP_ALLOWLIST = frozenset(
-    {"sonarr", "radarr", "lidarr", "readarr", "whisparr", "eros"}
-)
-SCHEDULER_TARGET_ALLOWLIST = SCHEDULER_APP_ALLOWLIST | {"global"}
+# Mapping from a schedule entry's `app` field to the base app whose
+# /config/{name}.json file should be mutated, or the literal "global" to fan
+# out across every app. The UI emits composite identifiers such as
+# "sonarr-all" and "whisparr-v3"; those are mapped to their underlying config
+# file here so per-app scheduled actions actually run instead of silently
+# no-op'ing on a non-existent /config/sonarr-all.json.
+SCHEDULE_APP_TARGETS = {
+    "global": "global",
+    "sonarr": "sonarr",
+    "radarr": "radarr",
+    "lidarr": "lidarr",
+    "readarr": "readarr",
+    "whisparr": "whisparr",
+    "eros": "eros",
+    "sonarr-all": "sonarr",
+    "radarr-all": "radarr",
+    "lidarr-all": "lidarr",
+    "readarr-all": "readarr",
+    "whisparr-v2": "whisparr",
+    "whisparr-v3": "eros",
+}
+
+
+def resolve_schedule_target(app_value):
+    """Resolve a schedule entry's `app` value to its target base app name.
+
+    Returns "global" for the global fan-out, a base app name (e.g. "sonarr",
+    "eros") whose /config/{name}.json should be mutated, or None when the
+    value is not a supported scheduler target.
+    """
+    if not isinstance(app_value, str):
+        return None
+    return SCHEDULE_APP_TARGETS.get(app_value)
 
 # Shape check for an `app` field on a schedule entry. This is intentionally
 # permissive (e.g. it allows UI-emitted composite values like "sonarr-all" or
-# "whisparr-v3") because the per-instance scheduler executor has historically
-# treated such values as no-ops via os.path.exists. The strict allowlist above
-# is what actually gates path construction; this regex only rejects values
-# that look like traversal payloads (path separators, parent-directory tokens,
-# embedded NULs, etc.) so they never get persisted to schedule.json.
+# "whisparr-v3") because resolution to config targets is handled by
+# `resolve_schedule_target()`. This regex only rejects values that look like
+# traversal payloads (path separators, parent-directory tokens, embedded NULs,
+# etc.) so they never get persisted to schedule.json.
 SCHEDULER_APP_FIELD_PATTERN = re.compile(r"^[A-Za-z0-9_-]+$")
 
 
@@ -138,16 +163,11 @@ def execute_action(action_entry):
     app_type = action_entry.get("app")
     app_id = action_entry.get("id")
 
-    # Constrain app_type before it is interpolated into the /config/{app}.json
-    # path below. Two cases:
-    #   1. Values that look like an attack payload (not a string, or containing
-    #      path separators / parent-directory tokens / NULs) are rejected loudly
-    #      with a history entry so the security event is visible.
-    #   2. Values that are syntactically safe but outside the allowlist (e.g.
-    #      the UI's composite identifiers like "sonarr-all" or "whisparr-v3",
-    #      which historically were no-ops via os.path.exists) are skipped
-    #      quietly to preserve existing behavior without polluting history.
-    if app_type not in SCHEDULER_TARGET_ALLOWLIST:
+    # Resolve UI-emitted identifiers (e.g. "sonarr-all", "whisparr-v3") to the
+    # underlying config target. `target_app` is what we use to build file
+    # paths and clear caches; `app_type` is preserved for log/history display.
+    target_app = resolve_schedule_target(app_type)
+    if target_app is None:
         if not is_valid_schedule_app_value(app_type):
             message = f"Rejected scheduled action with unsafe app value: {app_type!r}"
             scheduler_logger.warning(message)
@@ -173,7 +193,7 @@ def execute_action(action_entry):
         # Handle both old "pause" and new "disable" terminology
         if action_type == "pause" or action_type == "disable":
             # Disable logic for global or specific app
-            if app_type == "global":
+            if target_app == "global":
                 message = "Executing global pause action"
                 scheduler_logger.info(message)
                 try:
@@ -206,7 +226,7 @@ def execute_action(action_entry):
                 message = f"Executing disable action for {app_type}"
                 scheduler_logger.info(message)
                 try:
-                    config_file = f"/config/{app_type}.json"
+                    config_file = f"/config/{target_app}.json"
                     if os.path.exists(config_file):
                         with open(config_file, 'r') as f:
                             config_data = json.load(f)
@@ -220,7 +240,7 @@ def execute_action(action_entry):
                         with open(config_file, 'w') as f:
                             json.dump(config_data, f, indent=2)
                         # Clear cache for this app to ensure the UI refreshes
-                        clear_cache(app_type)
+                        clear_cache(target_app)
                     result_message = f"{app_type} disabled successfully"
                     scheduler_logger.info(result_message)
                     add_to_history(action_entry, "success", result_message)
@@ -229,11 +249,11 @@ def execute_action(action_entry):
                     scheduler_logger.error(error_message)
                     add_to_history(action_entry, "error", error_message)
                     return False
-        
+
         # Handle both old "resume" and new "enable" terminology
         elif action_type == "resume" or action_type == "enable":
             # Enable logic for global or specific app
-            if app_type == "global":
+            if target_app == "global":
                 message = "Executing global enable action"
                 scheduler_logger.info(message)
                 try:
@@ -266,7 +286,7 @@ def execute_action(action_entry):
                 message = f"Executing enable action for {app_type}"
                 scheduler_logger.info(message)
                 try:
-                    config_file = f"/config/{app_type}.json"
+                    config_file = f"/config/{target_app}.json"
                     if os.path.exists(config_file):
                         with open(config_file, 'r') as f:
                             config_data = json.load(f)
@@ -280,7 +300,7 @@ def execute_action(action_entry):
                         with open(config_file, 'w') as f:
                             json.dump(config_data, f, indent=2)
                         # Clear cache for this app to ensure the UI refreshes
-                        clear_cache(app_type)
+                        clear_cache(target_app)
                     result_message = f"{app_type} enabled successfully"
                     scheduler_logger.info(result_message)
                     add_to_history(action_entry, "success", result_message)
@@ -289,7 +309,13 @@ def execute_action(action_entry):
                     scheduler_logger.error(error_message)
                     add_to_history(action_entry, "error", error_message)
                     return False
-        
+
+        elif not isinstance(action_type, str):
+            error_message = f"Invalid action type: expected string, got {type(action_type).__name__}"
+            scheduler_logger.error(error_message)
+            add_to_history(action_entry, "error", error_message)
+            return False
+
         # Handle the API limit actions based on the predefined values
         elif action_type.startswith("api-") or action_type.startswith("API Limits "):
             # Extract the API limit value from the action type
@@ -299,8 +325,8 @@ def execute_action(action_entry):
                     api_limit = int(action_type.replace("api-", ""))
                 else:
                     api_limit = int(action_type.replace("API Limits ", ""))
-                
-                if app_type == "global":
+
+                if target_app == "global":
                     message = f"Setting global API cap to {api_limit}"
                     scheduler_logger.info(message)
                     try:
@@ -325,7 +351,7 @@ def execute_action(action_entry):
                     message = f"Setting API cap for {app_type} to {api_limit}"
                     scheduler_logger.info(message)
                     try:
-                        config_file = f"/config/{app_type}.json"
+                        config_file = f"/config/{target_app}.json"
                         if os.path.exists(config_file):
                             with open(config_file, 'r') as f:
                                 config_data = json.load(f)
